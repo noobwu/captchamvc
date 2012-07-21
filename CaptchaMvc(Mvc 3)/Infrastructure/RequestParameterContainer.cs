@@ -54,7 +54,7 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <returns>An instance of <typeparam name="T"></typeparam>.</returns>
+        /// <returns>An instance of T.</returns>
         public T Get<T>(string key)
         {
             return (T)Convert.ChangeType(_requestBase.Params[key], typeof(T));
@@ -65,7 +65,7 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <param name="value">An instance of <typeparam name="T"></typeparam>.</param>
+        /// <param name="value">An instance of T.</param>
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         public bool TryGet<T>(string key, out T value)
         {
@@ -77,7 +77,7 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <param name="value">An instance of <typeparam name="T"></typeparam>.</param>
+        /// <param name="value">An instance of T.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         public bool TryGet<T>(string key, out T value, T defaultValue)

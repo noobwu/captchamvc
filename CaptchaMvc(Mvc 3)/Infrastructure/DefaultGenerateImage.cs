@@ -59,8 +59,7 @@ namespace CaptchaMvc.Infrastructure
 
                 //Select the font size.
                 var meas = new SizeF(0, 0);
-                while (size > 2 && (meas = graphics.MeasureString(captchaText, font)).Width > Width ||
-                       meas.Height > Height)
+                while (size > 2 && (meas = graphics.MeasureString(captchaText, font)).Width > Width || meas.Height > Height)
                 {
                     font.Dispose();
                     size -= 2;

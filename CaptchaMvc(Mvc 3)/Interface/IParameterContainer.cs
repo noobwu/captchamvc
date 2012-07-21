@@ -22,7 +22,7 @@
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <returns>An instance of <typeparam name="T"></typeparam>.</returns>
+        /// <returns>An instance of T.</returns>
         T Get<T>(string key);
 
         /// <summary>
@@ -30,7 +30,7 @@
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <param name="value">An instance of <typeparam name="T"></typeparam>.</param>
+        /// <param name="value">An instance of T.</param>
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         bool TryGet<T>(string key, out T value);
 
@@ -39,7 +39,7 @@
         /// </summary>
         /// <typeparam name="T">The type of value.</typeparam>
         /// <param name="key">The specified key.</param>
-        /// <param name="value">An instance of <typeparam name="T"></typeparam>.</param>
+        /// <param name="value">An instance of T.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         bool TryGet<T>(string key, out T value, T defaultValue);

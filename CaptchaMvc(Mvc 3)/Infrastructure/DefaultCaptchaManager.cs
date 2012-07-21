@@ -19,27 +19,39 @@ namespace CaptchaMvc.Infrastructure
         private const string SessionKeys = "____________SessionKeys_____________";
         private const string SessionDrawingKeys = "____________SessionDrawingKeys_____________";
 
-        /// <summary>
-        /// The token parameter name.
-        /// </summary>
-        protected const string TokenParameterName = "t";
-
-        /// <summary>
-        /// The input element name.
-        /// </summary>
-        protected const string InputElementName = "CaptchaInputText";
-
-        /// <summary>
-        /// The image element name.
-        /// </summary>
-        protected const string ImageElementName = "CaptchaImage";
-
-        /// <summary>
-        /// The token element name.
-        /// </summary>
-        protected const string TokenElementName = "CaptchaDeText";
-
         private readonly object _locker = new object();
+        private string _imageElementName;
+        private string _inputElementName;
+        private string _tokenElementName;
+        private string _tokenParameterName;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultCaptchaManager"/> class.
+        /// </summary>
+        public DefaultCaptchaManager()
+            : this("t", "CaptchaInputText", "CaptchaImage", "CaptchaDeText")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultCaptchaManager"/> class.
+        /// </summary>
+        public DefaultCaptchaManager(string tokenParameterName, string inputElementName, string imageElementName,
+                                     string tokenElementName)
+        {
+            if (string.IsNullOrEmpty(tokenParameterName)) throw new ArgumentNullException("tokenParameterName");
+            if (string.IsNullOrEmpty(inputElementName)) throw new ArgumentNullException("inputElementName");
+            if (string.IsNullOrEmpty(imageElementName)) throw new ArgumentNullException("imageElementName");
+            if (string.IsNullOrEmpty(tokenElementName)) throw new ArgumentNullException("tokenElementName");
+            TokenParameterName = tokenParameterName;
+            InputElementName = inputElementName;
+            ImageElementName = imageElementName;
+            TokenElementName = tokenElementName;
+        }
 
         #endregion
 
@@ -84,6 +96,9 @@ namespace CaptchaMvc.Infrastructure
 
         #region Property
 
+        /// <summary>
+        /// The object to synchronize access to the collections, DrawingKeys and ValidateKeys.
+        /// </summary>
         protected object SessionLocker
         {
             get
@@ -101,6 +116,9 @@ namespace CaptchaMvc.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Contains tokens that have not yet been validated.
+        /// </summary>
         protected IDictionary<string, ICaptchaValue> ValidateKeys
         {
             get
@@ -118,6 +136,9 @@ namespace CaptchaMvc.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Contains tokens that have not yet been displayed.
+        /// </summary>
         protected IDictionary<string, ICaptchaValue> DrawingKeys
         {
             get
@@ -132,6 +153,58 @@ namespace CaptchaMvc.Infrastructure
                     }
                     return list;
                 }
+            }
+        }
+
+        /// <summary>
+        /// The token parameter name.
+        /// </summary>
+        protected internal string TokenParameterName
+        {
+            get { return _tokenParameterName; }
+            set
+            {
+                CaptchaUtils.IsNotNull(value, "The TokenParameterName can not be null.");
+                _tokenParameterName = value;
+            }
+        }
+
+        /// <summary>
+        /// The input element name in DOM.
+        /// </summary>
+        protected internal string InputElementName
+        {
+            get { return _inputElementName; }
+            set
+            {
+                CaptchaUtils.IsNotNull(value, "The InputElementName can not be null.");
+                _inputElementName = value;
+            }
+        }
+
+        /// <summary>
+        /// The image element name in DOM.
+        /// </summary>
+        protected internal string ImageElementName
+        {
+            get { return _imageElementName; }
+            set
+            {
+                CaptchaUtils.IsNotNull(value, "The ImageElementName can not be null.");
+                _imageElementName = value;
+            }
+        }
+
+        /// <summary>
+        /// The token element name in DOM.
+        /// </summary>
+        protected internal string TokenElementName
+        {
+            get { return _tokenElementName; }
+            set
+            {
+                CaptchaUtils.IsNotNull(value, "The TokenElementName can not be null.");
+                _tokenElementName = value;
             }
         }
 
@@ -152,7 +225,6 @@ namespace CaptchaMvc.Infrastructure
                                                           KeyValuePair<string, ICaptchaValue> captchaPair, string imgUrl,
                                                           string refreshUrl)
         {
-            bool isMath = parameterContainer.IsContain(MathCaptchaAttribute);
             string requiredText = null;
             string refreshText;
             string inputText;
@@ -162,7 +234,7 @@ namespace CaptchaMvc.Infrastructure
             if (isRequired)
                 parameterContainer.TryGet(RequiredMessageAttribute, out requiredText, "This is a required field.");
 
-            if (isMath)
+            if (parameterContainer.IsContain(MathCaptchaAttribute))
                 return new MathBuildInfoModel(TokenParameterName, MathCaptchaAttribute, isRequired, requiredText,
                                               refreshText, findInputText ? inputText : "The answer is", htmlHelper,
                                               InputElementName, TokenElementName,
@@ -183,8 +255,7 @@ namespace CaptchaMvc.Infrastructure
         protected virtual KeyValuePair<string, ICaptchaValue> CreateCaptchaPair(IParameterContainer parameterContainer,
                                                                                 ICaptchaValue oldValue)
         {
-            bool isMath = parameterContainer.IsContain(MathCaptchaAttribute);
-            if (isMath)
+            if (parameterContainer.IsContain(MathCaptchaAttribute))
                 return GenerateMathCaptcha();
 
             int length;
@@ -244,7 +315,7 @@ namespace CaptchaMvc.Infrastructure
         {
             string randomText = RandomText.Generate(GetCharacters(), length);
             return new KeyValuePair<string, ICaptchaValue>(Guid.NewGuid().ToString("N"),
-                                                           new StringCaptchaValue(randomText, randomText));
+                                                           new StringCaptchaValue(randomText, randomText, true));
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace CaptchaMvc.Models
         }
 
         /// <summary>
-        /// Determines whether the current captcha value is equal for the <see cref="inputText"/>.
+        /// Determines whether the current captcha value is equal for the <c>inputText</c>.
         /// </summary>
         /// <param name="inputText">The specified input text.</param>
         /// <returns><c>True</c> if the value is equals; otherwise, <c>false</c>.</returns>

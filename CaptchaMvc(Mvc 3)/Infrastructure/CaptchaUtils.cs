@@ -15,9 +15,10 @@ namespace CaptchaMvc.Infrastructure
     {
         #region Fields
 
-        private static readonly IGenerateImage DefaultGenerateImage = new DefaultGenerateImage();
-        private static readonly ICaptchaBuilderProvider DefaultBuilderProvider = new DefaultCaptchaBuilderProvider();
-        private static readonly ICaptchaManager DefaultEncryptionProvider = new DefaultCaptchaManager();
+        private static readonly object Locker = new object();
+        private static volatile IGenerateImage _defaultGenerateImage;
+        private static volatile ICaptchaBuilderProvider _defaultBuilderProvider;
+        private static volatile ICaptchaManager _defaultCaptchaManager;
 
         #endregion
 
@@ -28,7 +29,29 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         public static ICaptchaBuilderProvider BuilderProvider
         {
-            get { return GetService("DefaultCaptchaBuilderProvider", () => DefaultBuilderProvider); }
+            get
+            {
+                if (_defaultBuilderProvider == null)
+                {
+                    lock (Locker)
+                    {
+                        if (_defaultBuilderProvider == null)
+                        {
+                            _defaultBuilderProvider = GetService<ICaptchaBuilderProvider>("DefaultCaptchaBuilderProvider",
+                                                                 () => new DefaultCaptchaBuilderProvider());
+                        }
+                    }
+                }
+                return _defaultBuilderProvider;
+            }
+            set
+            {
+                lock (Locker)
+                {
+                    IsNotNull(value, "The BuilderProvider can not be null.");
+                    _defaultBuilderProvider = value;
+                }
+            }
         }
 
         /// <summary>
@@ -36,7 +59,30 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         public static ICaptchaManager CaptchaManager
         {
-            get { return GetService("DefaultCaptchaManager", () => DefaultEncryptionProvider); }
+            get
+            {
+                if (_defaultCaptchaManager == null)
+                {
+                    lock (Locker)
+                    {
+                        if (_defaultCaptchaManager == null)
+                        {
+                            _defaultCaptchaManager = GetService<ICaptchaManager>("DefaultCaptchaManager",
+                                                                () => new DefaultCaptchaManager());
+                        }
+                    }
+                }
+
+                return _defaultCaptchaManager;
+            }
+            set
+            {
+                lock (Locker)
+                {
+                    IsNotNull(value, "The CaptchaManager can not be null.");
+                    _defaultCaptchaManager = value;
+                }
+            }
         }
 
         /// <summary>
@@ -44,7 +90,28 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         public static IGenerateImage ImageGenerator
         {
-            get { return GetService("CaptchaIGenerate", () => DefaultGenerateImage); }
+            get
+            {
+                if (_defaultGenerateImage == null)
+                {
+                    lock (Locker)
+                    {
+                        if (_defaultGenerateImage == null)
+                        {
+                            _defaultGenerateImage = GetService<IGenerateImage>("CaptchaIGenerate", () => new DefaultGenerateImage());
+                        }
+                    }
+                }
+                return _defaultGenerateImage;
+            }
+            set
+            {
+                lock (Locker)
+                {
+                    IsNotNull(value, "The ImageGenerator can not be null.");
+                    _defaultGenerateImage = value;
+                }
+            }
         }
 
         #endregion
@@ -59,7 +126,8 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>The html string with a captcha.</returns>
         public static MvcHtmlString GenerateCaptcha(HtmlHelper htmlHelper, params ParameterModel[] parameters)
         {
-            IBuildInfoModel buildInfoModel = CaptchaManager.GenerateNew(htmlHelper, new ParameterModelContainer(parameters));
+            IBuildInfoModel buildInfoModel = CaptchaManager.GenerateNew(htmlHelper,
+                                                                        new ParameterModelContainer(parameters));
             return BuilderProvider.GenerateCaptcha(buildInfoModel);
         }
 
@@ -168,6 +236,12 @@ namespace CaptchaMvc.Infrastructure
         internal static bool IsContain(this IEnumerable<ParameterModel> parameters, string name)
         {
             return parameters.Any(model => model.Name.Equals(name));
+        }
+
+        internal static void IsNotNull(object obj, string message)
+        {
+            if (obj == null)
+                throw new ArgumentException(message);
         }
 
         #endregion
