@@ -46,6 +46,7 @@
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Annotations\JetBrains.cs" />
     <Compile Include="Attributes\CaptchaVerifyAttribute.cs" />
     <Compile Include="Controllers\DefaultCaptchaController.cs" />
     <Compile Include="HtmlHelpers\CaptchaHelper.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Infrastructure\DefaultGenerateImage.cs" />
     <Compile Include="Infrastructure\MathCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\ParameterModelContainer.cs" />
+    <Compile Include="Infrastructure\PartialCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\RandomNumber.cs" />
     <Compile Include="Infrastructure\RandomText.cs" />
     <Compile Include="Infrastructure\RequestParameterContainer.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Models\MathBuildInfoModel.cs" />
     <Compile Include="Models\NumberCaptchaValue.cs" />
     <Compile Include="Models\ParameterModel.cs" />
+    <Compile Include="Models\PartialBuildInfoModel.cs" />
     <Compile Include="Models\StringCaptchaValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

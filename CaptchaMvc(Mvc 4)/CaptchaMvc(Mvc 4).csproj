@@ -46,6 +46,9 @@
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Annotations\JetBrains.cs">
+      <Link>Annotations\JetBrains.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Attributes\CaptchaVerifyAttribute.cs">
       <Link>Attributes\CaptchaVerifyAttribute.cs</Link>
     </Compile>
@@ -75,6 +78,9 @@
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\ParameterModelContainer.cs">
       <Link>Infrastructure\ParameterModelContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\PartialCaptchaBuilder.cs">
+      <Link>Infrastructure\PartialCaptchaBuilder.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RandomNumber.cs">
       <Link>Infrastructure\RandomNumber.cs</Link>
@@ -132,6 +138,9 @@
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\ParameterModel.cs">
       <Link>Models\ParameterModel.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\PartialBuildInfoModel.cs">
+      <Link>Models\PartialBuildInfoModel.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\StringCaptchaValue.cs">
       <Link>Models\StringCaptchaValue.cs</Link>

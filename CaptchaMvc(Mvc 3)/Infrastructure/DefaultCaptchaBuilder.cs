@@ -19,7 +19,7 @@ namespace CaptchaMvc.Infrastructure
 
         private const string UpdateScript = @"
 <script type=""text/javascript"">
-$(function () {{$('#{0}').show();}})
+$(function () {{$('#{0}').show();}});
 function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, function(){{$('#{0}').show();}}); return false; }}</script>";
 
         #endregion

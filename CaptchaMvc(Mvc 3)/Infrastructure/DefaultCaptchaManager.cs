@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using CaptchaMvc.Interface;
 using CaptchaMvc.Models;
 
@@ -43,10 +44,14 @@ namespace CaptchaMvc.Infrastructure
         public DefaultCaptchaManager(string tokenParameterName, string inputElementName, string imageElementName,
                                      string tokenElementName)
         {
-            if (string.IsNullOrEmpty(tokenParameterName)) throw new ArgumentNullException("tokenParameterName");
-            if (string.IsNullOrEmpty(inputElementName)) throw new ArgumentNullException("inputElementName");
-            if (string.IsNullOrEmpty(imageElementName)) throw new ArgumentNullException("imageElementName");
-            if (string.IsNullOrEmpty(tokenElementName)) throw new ArgumentNullException("tokenElementName");
+            if (string.IsNullOrEmpty(tokenParameterName)) 
+                throw new ArgumentNullException("tokenParameterName");
+            if (string.IsNullOrEmpty(inputElementName)) 
+                throw new ArgumentNullException("inputElementName");
+            if (string.IsNullOrEmpty(imageElementName)) 
+                throw new ArgumentNullException("imageElementName");
+            if (string.IsNullOrEmpty(tokenElementName)) 
+                throw new ArgumentNullException("tokenElementName");
             TokenParameterName = tokenParameterName;
             InputElementName = inputElementName;
             ImageElementName = imageElementName;
@@ -91,6 +96,16 @@ namespace CaptchaMvc.Infrastructure
         /// The math parameter key.
         /// </summary>
         public const string MathCaptchaAttribute = "__m__";
+
+        /// <summary>
+        /// The partial view key.
+        /// </summary>
+        public const string PartialViewNameAttribute = "____PartialViewNameAttribute____";
+
+        /// <summary>
+        /// The partial view data attribute.
+        /// </summary>
+        public const string PartialViewDataAttribute = "____PartialViewDataAttribute____";
 
         #endregion
 
@@ -234,16 +249,26 @@ namespace CaptchaMvc.Infrastructure
             if (isRequired)
                 parameterContainer.TryGet(RequiredMessageAttribute, out requiredText, "This is a required field.");
 
+            IBuildInfoModel buildInfo;
             if (parameterContainer.IsContain(MathCaptchaAttribute))
-                return new MathBuildInfoModel(TokenParameterName, MathCaptchaAttribute, isRequired, requiredText,
+                buildInfo = new MathBuildInfoModel(TokenParameterName, MathCaptchaAttribute, isRequired, requiredText,
                                               refreshText, findInputText ? inputText : "The answer is", htmlHelper,
                                               InputElementName, TokenElementName,
                                               ImageElementName, imgUrl, refreshUrl, captchaPair.Key);
-
-            return new DefaultBuildInfoModel(TokenParameterName, requiredText, isRequired,
+            else
+                buildInfo = new DefaultBuildInfoModel(TokenParameterName, requiredText, isRequired,
                                              refreshText, findInputText ? inputText : "Input symbols", htmlHelper,
                                              InputElementName, ImageElementName, TokenElementName, refreshUrl, imgUrl,
                                              captchaPair.Key);
+
+            //If is it a partial view.
+            if (parameterContainer.IsContain(PartialViewNameAttribute))
+            {
+                ViewDataDictionary viewData;
+                parameterContainer.TryGet(PartialViewDataAttribute, out viewData);
+                return new PartialBuildInfoModel(htmlHelper, buildInfo, parameterContainer.Get<string>(PartialViewNameAttribute), viewData);
+            }
+            return buildInfo;
         }
 
         /// <summary>
@@ -263,6 +288,8 @@ namespace CaptchaMvc.Infrastructure
                 length = oldValue.CaptchaText.Length;
             else if (!parameterContainer.TryGet(LengthAttribute, out length))
                 throw new ArgumentException("Parameter is not specified for the length of the captcha.");
+            if (length <= 0)
+                throw new ArgumentException("The length parameter can not be <= 0.");
             return GenerateSimpleCaptcha(length);
         }
 
@@ -354,6 +381,8 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IBuildInfoModel"/>.</returns>
         public virtual IBuildInfoModel GenerateNew(HtmlHelper htmlHelper, IParameterContainer parameterContainer)
         {
+            if (htmlHelper == null) throw new ArgumentNullException("htmlHelper");
+            if (parameterContainer == null) throw new ArgumentNullException("parameterContainer");
             KeyValuePair<string, ICaptchaValue> captchaPair = CreateCaptchaPair(parameterContainer, null);
             lock (SessionLocker)
             {
@@ -361,7 +390,8 @@ namespace CaptchaMvc.Infrastructure
                 ValidateKeys.Add(captchaPair);
             }
             var urlHelper = new UrlHelper(htmlHelper.ViewContext.RequestContext);
-            string imgUrl = urlHelper.Action("Generate", "DefaultCaptcha", new {t = captchaPair.Key});
+            string imgUrl = urlHelper.Action("Generate", "DefaultCaptcha",
+                                             new RouteValueDictionary {{TokenParameterName, captchaPair.Key}});
             string refreshUrl = urlHelper.Action("Refresh", "DefaultCaptcha");
             return CreateBuildInfo(htmlHelper, parameterContainer, captchaPair, imgUrl, refreshUrl);
         }
@@ -373,6 +403,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IDrawingModel"/>.</returns>
         public virtual IDrawingModel GetDrawingModel(HttpRequestBase request)
         {
+            if (request == null) throw new ArgumentNullException("request");
             string token = request.Params[TokenParameterName];
             if (string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
@@ -385,8 +416,7 @@ namespace CaptchaMvc.Infrastructure
             }
             return CreateDrawingModel(new RequestParameterContainer(request), value);
         }
-
-
+        
         /// <summary>
         /// Create a new <see cref="IBuildInfoModel"/> for update a captcha.
         /// </summary>
@@ -394,6 +424,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IUpdateInfoModel"/>.</returns>
         public virtual IUpdateInfoModel Update(HttpRequestBase request)
         {
+            if (request == null) throw new ArgumentNullException("request");
             IParameterContainer parameterContainer = new RequestParameterContainer(request);
             string token;
             parameterContainer.TryGet(TokenParameterName, out token, null);
@@ -409,7 +440,8 @@ namespace CaptchaMvc.Infrastructure
             }
             KeyValuePair<string, ICaptchaValue> encryptValue = CreateCaptchaPair(parameterContainer, value);
             string newUrl = new UrlHelper(request.RequestContext).Action("Generate", "DefaultCaptcha",
-                                                                         new {t = encryptValue.Key});
+                                                                         new RouteValueDictionary
+                                                                             {{TokenParameterName, encryptValue.Key}});
             lock (SessionLocker)
             {
                 DrawingKeys.Add(encryptValue);
@@ -426,6 +458,8 @@ namespace CaptchaMvc.Infrastructure
         /// <returns><c>True</c> if the captcha is valid; otherwise, <c>false</c>.</returns>
         public virtual bool ValidateCaptcha(ControllerBase controller, IParameterContainer parameterContainer)
         {
+            if (controller == null) throw new ArgumentNullException("controller");
+            if (parameterContainer == null) throw new ArgumentNullException("parameterContainer");
             string tokenValue = controller.ValueProvider.GetValue(TokenElementName).AttemptedValue;
             string inputText = controller.ValueProvider.GetValue(InputElementName).AttemptedValue;
             ICaptchaValue value;

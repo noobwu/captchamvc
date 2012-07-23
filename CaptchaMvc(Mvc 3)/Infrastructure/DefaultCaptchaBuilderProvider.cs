@@ -91,6 +91,8 @@ $('#{2}').attr(""src"", ""{3}"");", updateInfo.TokenElementId,
                 return new DefaultCaptchaBuilder();
             if (buildInfoModel is MathBuildInfoModel)
                 return new MathCaptchaBuilder();
+            if (buildInfoModel is PartialBuildInfoModel)
+                return new PartialCaptchaBuilder();
             throw new NotSupportedException(
                 "DefaultCaptchaBuilderProvider does not support the type of a IBuildInfoModel = " +
                 buildInfoModel.GetType());
