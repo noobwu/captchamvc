@@ -16,6 +16,18 @@
         object Value { get; }
 
         /// <summary>
+        /// Serializes the <see cref="ICaptchaValue"/>, to the given string.
+        /// </summary>
+        /// <returns>The result string.</returns>
+        string Serialize();
+
+        /// <summary>
+        /// Deserializes the specified <see cref="string"/> into an <see cref="ICaptchaValue"/>.
+        /// </summary>
+        /// <param name="serializeState">The specified serialize state.</param>
+        void Deserialize(string serializeState);
+
+        /// <summary>
         /// Determines whether the current captcha value is equal for the <c>inputText</c>.
         /// </summary>
         /// <param name="inputText">The specified input text.</param>
