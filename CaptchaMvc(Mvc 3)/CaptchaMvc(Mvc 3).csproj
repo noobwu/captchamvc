@@ -51,6 +51,7 @@
     <Compile Include="Controllers\DefaultCaptchaController.cs" />
     <Compile Include="HtmlHelpers\CaptchaHelper.cs" />
     <Compile Include="Infrastructure\CaptchaUtils.cs" />
+    <Compile Include="Infrastructure\CookieStorageProvider.cs" />
     <Compile Include="Infrastructure\DefaultCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\DefaultCaptchaBuilderProvider.cs" />
     <Compile Include="Infrastructure\DefaultCaptchaManager.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Infrastructure\RandomNumber.cs" />
     <Compile Include="Infrastructure\RandomText.cs" />
     <Compile Include="Infrastructure\RequestParameterContainer.cs" />
+    <Compile Include="Infrastructure\SessionStorageProvider.cs" />
     <Compile Include="Interface\IBuildInfoModel.cs" />
     <Compile Include="Interface\ICaptchaBuilderProvider.cs" />
     <Compile Include="Interface\ICaptchaBulder.cs" />
@@ -69,8 +71,10 @@
     <Compile Include="Interface\IDrawingModel.cs" />
     <Compile Include="Interface\IGenerateImage.cs" />
     <Compile Include="Interface\IParameterContainer.cs" />
+    <Compile Include="Interface\IStorageProvider.cs" />
     <Compile Include="Interface\IUpdateInfoModel.cs" />
     <Compile Include="Models\BaseBuildInfoModel.cs" />
+    <Compile Include="Models\CaptchaValueBase.cs" />
     <Compile Include="Models\DefaultBuildInfoModel.cs" />
     <Compile Include="Models\DefaultDrawingModel.cs" />
     <Compile Include="Models\DefaultUpdateInfoModel.cs" />

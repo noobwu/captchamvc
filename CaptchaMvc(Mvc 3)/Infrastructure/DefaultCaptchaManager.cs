@@ -16,13 +16,9 @@ namespace CaptchaMvc.Infrastructure
     {
         #region Fields
 
-        private const string SessionLockerKey = "____________SessionLocker_____________";
-        private const string SessionKeys = "____________SessionKeys_____________";
-        private const string SessionDrawingKeys = "____________SessionDrawingKeys_____________";
-
-        private readonly object _locker = new object();
         private string _imageElementName;
         private string _inputElementName;
+        private IStorageProvider _storageProvider;
         private string _tokenElementName;
         private string _tokenParameterName;
 
@@ -34,24 +30,35 @@ namespace CaptchaMvc.Infrastructure
         /// Initializes a new instance of the <see cref="DefaultCaptchaManager"/> class.
         /// </summary>
         public DefaultCaptchaManager()
-            : this("t", "CaptchaInputText", "CaptchaImage", "CaptchaDeText")
+            : this(new SessionStorageProvider())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultCaptchaManager"/> class.
         /// </summary>
-        public DefaultCaptchaManager(string tokenParameterName, string inputElementName, string imageElementName,
+        public DefaultCaptchaManager(IStorageProvider storageProvider)
+            : this(storageProvider, "t", "CaptchaInputText", "CaptchaImage", "CaptchaDeText")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultCaptchaManager"/> class.
+        /// </summary>
+        public DefaultCaptchaManager(IStorageProvider storageProvider, string tokenParameterName,
+                                     string inputElementName, string imageElementName,
                                      string tokenElementName)
         {
-            if (string.IsNullOrEmpty(tokenParameterName)) 
+            if (storageProvider == null) throw new ArgumentNullException("storageProvider");
+            if (string.IsNullOrEmpty(tokenParameterName))
                 throw new ArgumentNullException("tokenParameterName");
-            if (string.IsNullOrEmpty(inputElementName)) 
+            if (string.IsNullOrEmpty(inputElementName))
                 throw new ArgumentNullException("inputElementName");
-            if (string.IsNullOrEmpty(imageElementName)) 
+            if (string.IsNullOrEmpty(imageElementName))
                 throw new ArgumentNullException("imageElementName");
-            if (string.IsNullOrEmpty(tokenElementName)) 
+            if (string.IsNullOrEmpty(tokenElementName))
                 throw new ArgumentNullException("tokenElementName");
+            StorageProvider = storageProvider;
             TokenParameterName = tokenParameterName;
             InputElementName = inputElementName;
             ImageElementName = imageElementName;
@@ -112,66 +119,6 @@ namespace CaptchaMvc.Infrastructure
         #region Property
 
         /// <summary>
-        /// The object to synchronize access to the collections, DrawingKeys and ValidateKeys.
-        /// </summary>
-        protected object SessionLocker
-        {
-            get
-            {
-                lock (_locker)
-                {
-                    object locker = HttpContext.Current.Session[SessionLockerKey];
-                    if (locker == null)
-                    {
-                        locker = new object();
-                        HttpContext.Current.Session[SessionLockerKey] = locker;
-                    }
-                    return locker;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Contains tokens that have not yet been validated.
-        /// </summary>
-        protected IDictionary<string, ICaptchaValue> ValidateKeys
-        {
-            get
-            {
-                lock (_locker)
-                {
-                    var list = HttpContext.Current.Session[SessionKeys] as IDictionary<string, ICaptchaValue>;
-                    if (list == null)
-                    {
-                        list = new Dictionary<string, ICaptchaValue>();
-                        HttpContext.Current.Session[SessionKeys] = list;
-                    }
-                    return list;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Contains tokens that have not yet been displayed.
-        /// </summary>
-        protected IDictionary<string, ICaptchaValue> DrawingKeys
-        {
-            get
-            {
-                lock (_locker)
-                {
-                    var list = HttpContext.Current.Session[SessionDrawingKeys] as IDictionary<string, ICaptchaValue>;
-                    if (list == null)
-                    {
-                        list = new Dictionary<string, ICaptchaValue>();
-                        HttpContext.Current.Session[SessionDrawingKeys] = list;
-                    }
-                    return list;
-                }
-            }
-        }
-
-        /// <summary>
         /// The token parameter name.
         /// </summary>
         protected internal string TokenParameterName
@@ -179,7 +126,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _tokenParameterName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The TokenParameterName can not be null.");
+                CaptchaUtils.IsNotNull(value, "The property TokenParameterName can not be null.");
                 _tokenParameterName = value;
             }
         }
@@ -192,7 +139,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _inputElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The InputElementName can not be null.");
+                CaptchaUtils.IsNotNull(value, "The property InputElementName can not be null.");
                 _inputElementName = value;
             }
         }
@@ -205,7 +152,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _imageElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The ImageElementName can not be null.");
+                CaptchaUtils.IsNotNull(value, "The property ImageElementName can not be null.");
                 _imageElementName = value;
             }
         }
@@ -218,7 +165,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _tokenElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The TokenElementName can not be null.");
+                CaptchaUtils.IsNotNull(value, "The property TokenElementName can not be null.");
                 _tokenElementName = value;
             }
         }
@@ -252,21 +199,24 @@ namespace CaptchaMvc.Infrastructure
             IBuildInfoModel buildInfo;
             if (parameterContainer.IsContain(MathCaptchaAttribute))
                 buildInfo = new MathBuildInfoModel(TokenParameterName, MathCaptchaAttribute, isRequired, requiredText,
-                                              refreshText, findInputText ? inputText : "The answer is", htmlHelper,
-                                              InputElementName, TokenElementName,
-                                              ImageElementName, imgUrl, refreshUrl, captchaPair.Key);
+                                                   refreshText, findInputText ? inputText : "The answer is", htmlHelper,
+                                                   InputElementName, TokenElementName,
+                                                   ImageElementName, imgUrl, refreshUrl, captchaPair.Key);
             else
                 buildInfo = new DefaultBuildInfoModel(TokenParameterName, requiredText, isRequired,
-                                             refreshText, findInputText ? inputText : "Input symbols", htmlHelper,
-                                             InputElementName, ImageElementName, TokenElementName, refreshUrl, imgUrl,
-                                             captchaPair.Key);
+                                                      refreshText, findInputText ? inputText : "Input symbols",
+                                                      htmlHelper,
+                                                      InputElementName, ImageElementName, TokenElementName, refreshUrl,
+                                                      imgUrl,
+                                                      captchaPair.Key);
 
             //If is it a partial view.
             if (parameterContainer.IsContain(PartialViewNameAttribute))
             {
                 ViewDataDictionary viewData;
                 parameterContainer.TryGet(PartialViewDataAttribute, out viewData);
-                return new PartialBuildInfoModel(htmlHelper, buildInfo, parameterContainer.Get<string>(PartialViewNameAttribute), viewData);
+                return new PartialBuildInfoModel(htmlHelper, buildInfo,
+                                                 parameterContainer.Get<string>(PartialViewNameAttribute), viewData);
             }
             return buildInfo;
         }
@@ -358,6 +308,29 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
+        /// Generate a URL for a captcha image.
+        /// </summary>
+        /// <param name="urlHelper">The specified <see cref="UrlHelper"/>.</param>
+        /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/>.</param>
+        /// <returns>The url of captcha image.</returns>
+        protected virtual string GenerateImageUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
+        {
+            return urlHelper.Action("Generate", "DefaultCaptcha",
+                                    new RouteValueDictionary {{TokenParameterName, captchaPair.Key}});
+        }
+
+        /// <summary>
+        /// Generate a URL for a refresh captcha.
+        /// </summary>
+        /// <param name="urlHelper">The specified <see cref="UrlHelper"/>.</param>
+        /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/>.</param>
+        /// <returns>The url of refresh captcha.</returns>
+        protected virtual string GenerateRefreshUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
+        {
+            return urlHelper.Action("Refresh", "DefaultCaptcha");
+        }
+
+        /// <summary>
         /// Get the characters for creating captcha.
         /// </summary>
         /// <returns>The characters.</returns>
@@ -374,6 +347,19 @@ namespace CaptchaMvc.Infrastructure
         #region Implementation of ICaptchaManager
 
         /// <summary>
+        /// Gets or sets the storage to save a captcha tokens.
+        /// </summary>
+        public IStorageProvider StorageProvider
+        {
+            get { return _storageProvider; }
+            set
+            {
+                CaptchaUtils.IsNotNull(value, "The property StorageProvider can not be null.");
+                _storageProvider = value;
+            }
+        }
+
+        /// <summary>
         /// Create a <see cref="IBuildInfoModel"/> for create a new captcha.
         /// </summary>
         /// <param name="htmlHelper">The specified <see cref="HtmlHelper"/>.</param>
@@ -381,18 +367,15 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IBuildInfoModel"/>.</returns>
         public virtual IBuildInfoModel GenerateNew(HtmlHelper htmlHelper, IParameterContainer parameterContainer)
         {
-            if (htmlHelper == null) throw new ArgumentNullException("htmlHelper");
-            if (parameterContainer == null) throw new ArgumentNullException("parameterContainer");
+            if (htmlHelper == null)
+                throw new ArgumentNullException("htmlHelper");
+            if (parameterContainer == null)
+                throw new ArgumentNullException("parameterContainer");
             KeyValuePair<string, ICaptchaValue> captchaPair = CreateCaptchaPair(parameterContainer, null);
-            lock (SessionLocker)
-            {
-                DrawingKeys.Add(captchaPair);
-                ValidateKeys.Add(captchaPair);
-            }
+            StorageProvider.Add(captchaPair);
             var urlHelper = new UrlHelper(htmlHelper.ViewContext.RequestContext);
-            string imgUrl = urlHelper.Action("Generate", "DefaultCaptcha",
-                                             new RouteValueDictionary {{TokenParameterName, captchaPair.Key}});
-            string refreshUrl = urlHelper.Action("Refresh", "DefaultCaptcha");
+            string imgUrl = GenerateImageUrl(urlHelper, captchaPair);
+            string refreshUrl = GenerateRefreshUrl(urlHelper, captchaPair);
             return CreateBuildInfo(htmlHelper, parameterContainer, captchaPair, imgUrl, refreshUrl);
         }
 
@@ -403,20 +386,17 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IDrawingModel"/>.</returns>
         public virtual IDrawingModel GetDrawingModel(HttpRequestBase request)
         {
-            if (request == null) throw new ArgumentNullException("request");
+            if (request == null)
+                throw new ArgumentNullException("request");
             string token = request.Params[TokenParameterName];
             if (string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
-            ICaptchaValue value;
-            lock (SessionLocker)
-            {
-                if (!DrawingKeys.TryGetValue(token, out value))
-                    throw new ArgumentException("The key is to generate incorrect.");
-                DrawingKeys.Remove(token);
-            }
-            return CreateDrawingModel(new RequestParameterContainer(request), value);
+            ICaptchaValue captchaValue = StorageProvider.GetDrawingValue(token);
+            if (captchaValue == null)
+                throw new ArgumentException("The key is to generate incorrect.");
+            return CreateDrawingModel(new RequestParameterContainer(request), captchaValue);
         }
-        
+
         /// <summary>
         /// Create a new <see cref="IBuildInfoModel"/> for update a captcha.
         /// </summary>
@@ -424,30 +404,20 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of <see cref="IUpdateInfoModel"/>.</returns>
         public virtual IUpdateInfoModel Update(HttpRequestBase request)
         {
-            if (request == null) throw new ArgumentNullException("request");
+            if (request == null)
+                throw new ArgumentNullException("request");
             IParameterContainer parameterContainer = new RequestParameterContainer(request);
             string token;
             parameterContainer.TryGet(TokenParameterName, out token, null);
             if (string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
-            ICaptchaValue value;
-            lock (SessionLocker)
-            {
-                if (!ValidateKeys.TryGetValue(token, out value))
-                    throw new ArgumentException("The key is to update incorrect.");
-                DrawingKeys.Remove(token);
-                ValidateKeys.Remove(token);
-            }
-            KeyValuePair<string, ICaptchaValue> encryptValue = CreateCaptchaPair(parameterContainer, value);
-            string newUrl = new UrlHelper(request.RequestContext).Action("Generate", "DefaultCaptcha",
-                                                                         new RouteValueDictionary
-                                                                             {{TokenParameterName, encryptValue.Key}});
-            lock (SessionLocker)
-            {
-                DrawingKeys.Add(encryptValue);
-                ValidateKeys.Add(encryptValue);
-            }
-            return new DefaultUpdateInfoModel(TokenElementName, encryptValue.Key, newUrl, ImageElementName);
+            ICaptchaValue captchaValue = StorageProvider.GetValidationValue(token);
+            if (captchaValue == null)
+                throw new ArgumentException("The key is to update incorrect.");
+            KeyValuePair<string, ICaptchaValue> captchaPair = CreateCaptchaPair(parameterContainer, captchaValue);
+            string newUrl = GenerateImageUrl(new UrlHelper(request.RequestContext), captchaPair);
+            StorageProvider.Add(captchaPair);
+            return new DefaultUpdateInfoModel(TokenElementName, captchaPair.Key, newUrl, ImageElementName);
         }
 
         /// <summary>
@@ -458,27 +428,19 @@ namespace CaptchaMvc.Infrastructure
         /// <returns><c>True</c> if the captcha is valid; otherwise, <c>false</c>.</returns>
         public virtual bool ValidateCaptcha(ControllerBase controller, IParameterContainer parameterContainer)
         {
-            if (controller == null) throw new ArgumentNullException("controller");
-            if (parameterContainer == null) throw new ArgumentNullException("parameterContainer");
+            if (controller == null)
+                throw new ArgumentNullException("controller");
+            if (parameterContainer == null)
+                throw new ArgumentNullException("parameterContainer");
             string tokenValue = controller.ValueProvider.GetValue(TokenElementName).AttemptedValue;
             string inputText = controller.ValueProvider.GetValue(InputElementName).AttemptedValue;
-            ICaptchaValue value;
-            lock (SessionLocker)
-            {
-                DrawingKeys.Remove(tokenValue);
-                if (!ValidateKeys.TryGetValue(tokenValue, out value))
-                {
-                    WriteError(controller, parameterContainer);
-                    return false;
-                }
-                ValidateKeys.Remove(tokenValue);
-            }
-            if (string.IsNullOrEmpty(inputText))
+            ICaptchaValue captchaValue = StorageProvider.GetValidationValue(tokenValue);
+            if (captchaValue == null || string.IsNullOrEmpty(inputText))
             {
                 WriteError(controller, parameterContainer);
                 return false;
             }
-            bool isVerify = value.IsEqual(inputText);
+            bool isVerify = captchaValue.IsEqual(inputText);
             if (isVerify)
                 return true;
             WriteError(controller, parameterContainer);

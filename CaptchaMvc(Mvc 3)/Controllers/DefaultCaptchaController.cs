@@ -18,7 +18,7 @@ namespace CaptchaMvc.Controllers
             try
             {
                 if (Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
-                    throw new Exception();
+                    throw new InvalidOperationException();
                 IDrawingModel drawingModel = CaptchaUtils.CaptchaManager.GetDrawingModel(Request);
                 CaptchaUtils.BuilderProvider.WriteCaptchaImage(Response, drawingModel);
             }
@@ -29,7 +29,7 @@ namespace CaptchaMvc.Controllers
         }
 
         /// <summary>
-        /// Reresh a captcha.
+        /// Refresh a captcha.
         /// </summary>
         /// <returns>The specified <see cref="ActionResult"/>.</returns>
         public virtual ActionResult Refresh()
@@ -39,7 +39,6 @@ namespace CaptchaMvc.Controllers
                 IUpdateInfoModel infoModel = CaptchaUtils.CaptchaManager.Update(Request);
                 return CaptchaUtils.BuilderProvider.RefreshCaptcha(infoModel);
             }
-
             return Redirect(Request.UrlReferrer.AbsolutePath);
         }
     }

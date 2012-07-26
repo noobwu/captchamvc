@@ -61,6 +61,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\CaptchaUtils.cs">
       <Link>Infrastructure\CaptchaUtils.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\CookieStorageProvider.cs">
+      <Link>Infrastructure\CookieStorageProvider.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultCaptchaBuilder.cs">
       <Link>Infrastructure\DefaultCaptchaBuilder.cs</Link>
     </Compile>
@@ -91,6 +94,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RequestParameterContainer.cs">
       <Link>Infrastructure\RequestParameterContainer.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\SessionStorageProvider.cs">
+      <Link>Infrastructure\SessionStorageProvider.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IBuildInfoModel.cs">
       <Link>Interface\IBuildInfoModel.cs</Link>
     </Compile>
@@ -115,11 +121,17 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IParameterContainer.cs">
       <Link>Interface\IParameterContainer.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IStorageProvider.cs">
+      <Link>Interface\IStorageProvider.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IUpdateInfoModel.cs">
       <Link>Interface\IUpdateInfoModel.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\BaseBuildInfoModel.cs">
       <Link>Models\BaseBuildInfoModel.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\CaptchaValueBase.cs">
+      <Link>Infrastructure\CaptchaValueBase.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\DefaultBuildInfoModel.cs">
       <Link>Models\DefaultBuildInfoModel.cs</Link>

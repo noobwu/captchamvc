@@ -9,6 +9,11 @@ namespace CaptchaMvc.Interface
     public interface ICaptchaManager
     {
         /// <summary>
+        /// Gets or sets the storage to save a captcha tokens.
+        /// </summary>
+        IStorageProvider StorageProvider { get; set; }
+
+        /// <summary>
         /// Create a <see cref="IBuildInfoModel"/> for create a new captcha.
         /// </summary>
         /// <param name="htmlHelper">The specified <see cref="HtmlHelper"/>.</param>

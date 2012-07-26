@@ -25,7 +25,7 @@ namespace CaptchaMvc.Infrastructure
         #region Property
 
         /// <summary>
-        /// Gets the current <see cref="ICaptchaBuilderProvider"/>.
+        /// Gets or sets the current <see cref="ICaptchaBuilderProvider"/>.
         /// </summary>
         public static ICaptchaBuilderProvider BuilderProvider
         {
@@ -55,7 +55,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets the current <see cref="ICaptchaManager"/>.
+        /// Gets or sets the current <see cref="ICaptchaManager"/>.
         /// </summary>
         public static ICaptchaManager CaptchaManager
         {
@@ -86,7 +86,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets the current <see cref="IGenerateImage"/>.
+        /// Gets or sets the current <see cref="IGenerateImage"/>.
         /// </summary>
         public static IGenerateImage ImageGenerator
         {
@@ -241,6 +241,12 @@ namespace CaptchaMvc.Infrastructure
         internal static void IsNotNull(object obj, string message)
         {
             if (obj == null)
+                throw new ArgumentException(message);
+        }
+
+        internal static void IsNotNull(string obj, string message)
+        {
+            if (string.IsNullOrEmpty(obj))
                 throw new ArgumentException(message);
         }
 
