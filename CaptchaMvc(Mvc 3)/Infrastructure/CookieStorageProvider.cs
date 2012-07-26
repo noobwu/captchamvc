@@ -115,8 +115,8 @@ namespace CaptchaMvc.Infrastructure
             httpCookie.Values.Add(captchaPair.Key, serialize);
             httpCookieDrawing.Values.Add(captchaPair.Key, serialize);
 
-            HttpContext.Current.Response.Cookies.Set(httpCookie);
-            HttpContext.Current.Response.Cookies.Set(httpCookieDrawing);
+            HttpContext.Current.Response.Cookies.Add(httpCookie);
+            HttpContext.Current.Response.Cookies.Add(httpCookieDrawing);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace CaptchaMvc.Infrastructure
             httpCookie.Values.Remove(token);
             httpCookie.Expires = DateTime.Now.AddMinutes(ExpiresMinutes);
             httpCookie.HttpOnly = true;
-            HttpContext.Current.Response.Cookies.Set(httpCookie);
+            HttpContext.Current.Response.Cookies.Add(httpCookie);
             return Deserialize(value);
         }
 
