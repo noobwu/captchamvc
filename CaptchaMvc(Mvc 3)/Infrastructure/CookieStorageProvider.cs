@@ -16,7 +16,7 @@ namespace CaptchaMvc.Infrastructure
     {
         #region Fields
 
-        private const int MaxCookieLength = 3000;
+        private const int MaxCookieLength = 2000;
         private const string CookieKey = "wrawrsatrsrweasrdxsf";
         private const string Separator = "|~|~~|~|";
         private const string DrawingKey = "w2ewasjret";

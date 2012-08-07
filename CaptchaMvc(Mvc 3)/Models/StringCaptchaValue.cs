@@ -6,6 +6,7 @@ namespace CaptchaMvc.Models
     /// <summary>
     /// Represents the base model for storing ​string ​captcha values.
     /// </summary>
+    [Serializable]
     public class StringCaptchaValue : CaptchaValueBase
     {
         #region Fields
