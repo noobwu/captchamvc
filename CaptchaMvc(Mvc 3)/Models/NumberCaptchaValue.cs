@@ -4,7 +4,7 @@ using CaptchaMvc.Interface;
 namespace CaptchaMvc.Models
 {
     /// <summary>
-    /// Represents the base model for storing number ​​captcha values.
+    ///     Represents the base model for storing number ​​captcha values.
     /// </summary>
     [Serializable]
     public class NumberCaptchaValue : CaptchaValueBase
@@ -19,14 +19,14 @@ namespace CaptchaMvc.Models
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumberCaptchaValue"/> class. This constructor used only for deserialize.
+        ///     Initializes a new instance of the <see cref="NumberCaptchaValue" /> class. This constructor used only for deserialize.
         /// </summary>
         protected NumberCaptchaValue()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumberCaptchaValue"/> class.
+        ///     Initializes a new instance of the <see cref="NumberCaptchaValue" /> class.
         /// </summary>
         public NumberCaptchaValue(string captchaText, int value)
         {
@@ -41,7 +41,7 @@ namespace CaptchaMvc.Models
         #region Implementation of ICaptchaValue
 
         /// <summary>
-        /// Gets the specified captcha text.
+        ///     Gets the specified captcha text.
         /// </summary>
         public override string CaptchaText
         {
@@ -49,7 +49,7 @@ namespace CaptchaMvc.Models
         }
 
         /// <summary>
-        /// Gets the specified captcha value.
+        ///     Gets the specified captcha value.
         /// </summary>
         public override object Value
         {
@@ -57,10 +57,10 @@ namespace CaptchaMvc.Models
         }
 
         /// <summary>
-        /// Determines whether the current captcha value is equal for the <c>inputText</c>.
+        ///     Determines whether the current captcha value is equal for the <c>inputText</c>.
         /// </summary>
-        /// <param name="inputText">The specified input text.</param>
-        /// <returns><c>True</c> if the value is equals; otherwise, <c>false</c>.</returns>
+        /// <param name="inputText"> The specified input text. </param>
+        /// <returns> <c>True</c> if the value is equals; otherwise, <c>false</c> . </returns>
         public override bool IsEqual(string inputText)
         {
             int input;
@@ -70,11 +70,12 @@ namespace CaptchaMvc.Models
         }
 
         /// <summary>
-        /// Deserializes the specified values into an <see cref="ICaptchaValue"/>.
+        ///     Deserializes the specified values into an <see cref="ICaptchaValue" />.
         /// </summary>
-        /// <param name="captchaText">The specified captcha text.</param>
-        /// <param name="value">The specified captcha value.</param>
-        protected override void DeserializeInternal(string captchaText, string value)
+        /// <param name="captchaText"> The specified captcha text. </param>
+        /// <param name="value"> The specified captcha value. </param>
+        /// <param name="source"> The specified values. </param>
+        protected override void DeserializeInternal(string captchaText, string value, string[] source)
         {
             _captchaText = captchaText;
             _value = int.Parse(value);

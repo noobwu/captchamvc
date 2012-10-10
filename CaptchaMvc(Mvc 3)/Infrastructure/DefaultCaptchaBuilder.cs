@@ -81,6 +81,8 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
                 attributes.Add(@"data-val", "true");
                 attributes.Add("data-val-required", buildInfo.RequiredMessage);
             }
+            attributes.Add("autocomplete", "off");
+            attributes.Add("autocorrect", "off");
             MvcHtmlString input = buildInfo.HtmlHelper.TextBox(buildInfo.InputElementId, null, attributes);
             MvcHtmlString validationMessage = buildInfo.HtmlHelper.ValidationMessage(buildInfo.InputElementId);
             return string.Format("{0}<br/>{1}", input, validationMessage);
