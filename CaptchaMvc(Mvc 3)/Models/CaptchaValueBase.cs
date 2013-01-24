@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -7,6 +8,7 @@ namespace CaptchaMvc.Models
     ///     Represents the base model for storing ​​captcha values.
     /// </summary>
     [Serializable]
+    [DataContract, KnownType(typeof(StringCaptchaValue)), KnownType(typeof(NumberCaptchaValue))]
     public abstract class CaptchaValueBase : ICaptchaValue
     {
         #region Implementation of ICaptchaValue
@@ -14,11 +16,13 @@ namespace CaptchaMvc.Models
         /// <summary>
         ///     Gets the specified captcha text.
         /// </summary>
+        [DataMember]
         public abstract string CaptchaText { get; }
 
         /// <summary>
         ///     Gets the specified captcha value.
         /// </summary>
+        [DataMember]
         public abstract object Value { get; }
 
         /// <summary>

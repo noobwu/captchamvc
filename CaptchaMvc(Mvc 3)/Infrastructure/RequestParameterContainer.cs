@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using CaptchaMvc.Interface;
@@ -6,11 +7,16 @@ using CaptchaMvc.Interface;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Adapter for use with the <see cref="HttpRequestBase"/> as a <see cref="IParameterContainer"/>.
+    /// Adapter for use the <see cref="HttpRequestBase"/> as a <see cref="IParameterContainer"/>.
     /// </summary>
     public class RequestParameterContainer : IParameterContainer
     {
         #region Fields
+
+        /// <summary>
+        /// The <see cref="HttpRequestBase"/> parameter key.
+        /// </summary>
+        public const string HttpRequestParameterKey = "RequestParameterKey";
 
         private readonly HttpRequestBase _requestBase;
 
@@ -46,6 +52,8 @@ namespace CaptchaMvc.Infrastructure
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         public bool IsContain(string key)
         {
+            if (key == HttpRequestParameterKey)
+                return true;
             return _requestBase.Params.AllKeys.Any(s => s.Equals(key));
         }
 
@@ -57,7 +65,9 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of T.</returns>
         public T Get<T>(string key)
         {
-            return (T)Convert.ChangeType(_requestBase.Params[key], typeof(T));
+            if (key == HttpRequestParameterKey)
+                return (T) ((object) _requestBase);
+            return (T) TypeDescriptor.GetConverter(typeof (T)).ConvertFrom(_requestBase.Params[key]);
         }
 
         /// <summary>
@@ -82,9 +92,11 @@ namespace CaptchaMvc.Infrastructure
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         public bool TryGet<T>(string key, out T value, T defaultValue)
         {
-            value = defaultValue;
             if (!IsContain(key))
+            {
+                value = defaultValue;
                 return false;
+            }
             value = Get<T>(key);
             return true;
         }

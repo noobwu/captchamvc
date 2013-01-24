@@ -3,14 +3,14 @@
 namespace CaptchaMvc.Models
 {
     /// <summary>
-    /// Represents the base model for captcha parameter.
+    ///     Represents the base model for captcha parameter.
     /// </summary>
     public class ParameterModel
     {
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterModel"/> class.
+        ///     Initializes a new instance of the <see cref="ParameterModel" /> class.
         /// </summary>
         public ParameterModel(string name, object value)
         {
@@ -22,15 +22,15 @@ namespace CaptchaMvc.Models
 
         #endregion
 
-        #region Property
+        #region Properties
 
         /// <summary>
-        /// Gets the key in the <see cref="ParameterModel"/>.
+        ///     Gets the name.
         /// </summary>
         public string Name { get; private set; }
 
         /// <summary>
-        /// Gets the value in the <see cref="ParameterModel"/>.
+        ///     Gets the value.
         /// </summary>
         public object Value { get; private set; }
 

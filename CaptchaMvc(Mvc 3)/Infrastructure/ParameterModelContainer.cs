@@ -5,7 +5,7 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Adapter for use with the collection of <see cref="ParameterModel"/> as a <see cref="IParameterContainer"/>.
+    /// Adapter for use the collection of <see cref="ParameterModel"/> as a <see cref="IParameterContainer"/>.
     /// </summary>
     public class ParameterModelContainer : IParameterContainer
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
 {
@@ -13,11 +14,11 @@ namespace CaptchaMvc.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="MathBuildInfoModel"/> class.
         /// </summary>
-        public MathBuildInfoModel(string tokenParameterName, string mathParamterName, bool isRequired,
+        public MathBuildInfoModel(IParameterContainer parameterContainer, string tokenParameterName, string mathParamterName, bool isRequired,
                                   string requiredMessage, string refreshButtonText, string inputText,
                                   HtmlHelper htmlHelper, string inputElementId, string tokenElementId,
                                   string imageElementId, string imageUrl, string refreshUrl, string tokenValue)
-            : base(
+            : base(parameterContainer,
                 tokenParameterName, requiredMessage, isRequired, refreshButtonText, inputText, htmlHelper,
                 inputElementId, imageElementId, tokenElementId, refreshUrl, imageUrl, tokenValue)
         {
@@ -27,7 +28,7 @@ namespace CaptchaMvc.Models
 
         #endregion
 
-        #region Property
+        #region Properties
 
         /// <summary>
         /// Gets the math parameter name.

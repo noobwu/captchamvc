@@ -19,10 +19,27 @@ namespace CaptchaMvc.Infrastructure
         private static volatile IGenerateImage _defaultGenerateImage;
         private static volatile ICaptchaBuilderProvider _defaultBuilderProvider;
         private static volatile ICaptchaManager _defaultCaptchaManager;
+        private static Func<IParameterContainer, ICaptchaBuilderProvider> _builderProviderFactory;
+        private static Func<IParameterContainer, ICaptchaManager> _captchaManagerFactory;
+        private static Func<IDrawingModel, IGenerateImage> _imageGeneratorFactory;
 
         #endregion
 
-        #region Property
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CaptchaUtils"/> class.
+        /// </summary>
+        static CaptchaUtils()
+        {
+            BuilderProviderFactory = container => BuilderProvider;
+            CaptchaManagerFactory = container => CaptchaManager;
+            ImageGeneratorFactory = model => ImageGenerator;
+        }
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Gets or sets the current <see cref="ICaptchaBuilderProvider"/>.
@@ -48,7 +65,7 @@ namespace CaptchaMvc.Infrastructure
             {
                 lock (Locker)
                 {
-                    IsNotNull(value, "The BuilderProvider can not be null.");
+                    IsNotNull(value, "The BuilderProvider cannot be null.");
                     _defaultBuilderProvider = value;
                 }
             }
@@ -68,7 +85,7 @@ namespace CaptchaMvc.Infrastructure
                         if (_defaultCaptchaManager == null)
                         {
                             _defaultCaptchaManager = GetService<ICaptchaManager>("DefaultCaptchaManager",
-                                                                () => new DefaultCaptchaManager());
+                                                                () => new DefaultCaptchaManager(new SessionStorageProvider()));
                         }
                     }
                 }
@@ -114,6 +131,45 @@ namespace CaptchaMvc.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Gets or sets the factory to create <see cref="ICaptchaBuilderProvider"/>.
+        /// </summary>
+        public static Func<IParameterContainer, ICaptchaBuilderProvider> BuilderProviderFactory
+        {
+            get { return _builderProviderFactory; }
+            set
+            {
+                IsNotNull(value, "The property BuilderProviderFactory cannot be a null.");
+                _builderProviderFactory = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the factory to create <see cref="ICaptchaManager"/>.
+        /// </summary>
+        public static Func<IParameterContainer, ICaptchaManager> CaptchaManagerFactory
+        {
+            get { return _captchaManagerFactory; }
+            set
+            {
+                IsNotNull(value, "The property CaptchaManagerFactory cannot be a null.");
+                _captchaManagerFactory = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the factory to create <see cref="IGenerateImage"/>.
+        /// </summary>
+        public static Func<IDrawingModel, IGenerateImage> ImageGeneratorFactory
+        {
+            get { return _imageGeneratorFactory; }
+            set
+            {
+                IsNotNullProperty(value, "ImageGeneratorFactory");
+                _imageGeneratorFactory = value;
+            }
+        }
+
         #endregion
 
         #region Public methods
@@ -123,12 +179,12 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         /// <param name="htmlHelper">The specified <see cref="HtmlHelper"/>.</param>
         /// <param name="parameters">The specified attributes.</param>
-        /// <returns>The html string with a captcha.</returns>
-        public static MvcHtmlString GenerateCaptcha(HtmlHelper htmlHelper, params ParameterModel[] parameters)
+        /// <returns>An instance of <see cref="ICaptcha"/>.</returns>
+        public static ICaptcha GenerateCaptcha(HtmlHelper htmlHelper, IList<ParameterModel> parameters)
         {
-            IBuildInfoModel buildInfoModel = CaptchaManager.GenerateNew(htmlHelper,
-                                                                        new ParameterModelContainer(parameters));
-            return BuilderProvider.GenerateCaptcha(buildInfoModel);
+            var parameterContainer = new ParameterModelContainer(parameters);
+            var buildInfoModel = CaptchaManagerFactory(parameterContainer).GenerateNew(htmlHelper, parameterContainer);
+            return BuilderProviderFactory(parameterContainer).GenerateCaptcha(buildInfoModel);
         }
 
         /// <summary>
@@ -137,14 +193,25 @@ namespace CaptchaMvc.Infrastructure
         /// <param name="controller">The specified <see cref="ControllerBase"/>.</param>
         /// <param name="attributes">The specified attributes.</param>
         /// <returns><c>True</c> if the captcha is valid; otherwise, <c>false</c>.</returns>
-        public static bool ValidateCaptcha(ControllerBase controller, params ParameterModel[] attributes)
+        public static bool ValidateCaptcha(ControllerBase controller, IList<ParameterModel> attributes)
         {
-            return CaptchaManager.ValidateCaptcha(controller, new ParameterModelContainer(attributes));
+            var container = new CombinedParameterContainer(
+                new RequestParameterContainer(controller.ControllerContext.HttpContext.Request),
+                new ParameterModelContainer(attributes));
+            return CaptchaManagerFactory(container).ValidateCaptcha(controller, container);            
         }
 
         #endregion
 
         #region Internal methods
+
+        internal static List<ParameterModel> GetParameters(ParameterModel[] parameters)
+        {
+            var list = new List<ParameterModel>();
+            if (parameters != null && parameters.Length > 0)
+                list.AddRange(parameters);
+            return list;
+        } 
 
         internal static T GetService<T>(string configName, Func<T> defaultValue) where T : class
         {
@@ -157,7 +224,7 @@ namespace CaptchaMvc.Infrastructure
                         string.Format(
                             "When load the {1}. Type the name of the {0} can not be found in assemblies.",
                             nameType, configName));
-                return (T) type.Assembly.CreateInstance(type.FullName, true);
+                return (T)type.Assembly.CreateInstance(type.FullName, true);
             }
             T service;
             if (!TryGetService(out service))
@@ -183,30 +250,23 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         /// Gets the value associated with the specified name.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="parameters"></param>
-        /// <param name="name"></param>
-        /// <param name="result"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
         internal static bool TryFindParameter<T>(this IEnumerable<ParameterModel> parameters, string name, out T result,
                                                  T defaultValue)
         {
-            result = defaultValue;
-            if (!IsContain(parameters, name))
+
+            ParameterModel parameter = parameters.FirstOrDefault(model => model.Name.Equals(name));
+            if (parameter == null)
+            {
+                result = defaultValue;
                 return false;
-            result = FindParameter<T>(parameters, name);
+            }
+            result = (T)parameter.Value;
             return true;
         }
 
         /// <summary>
         /// Gets the value associated with the specified name.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="parameters"></param>
-        /// <param name="name"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
         internal static bool TryFindParameter<T>(this IEnumerable<ParameterModel> parameters, string name, out T result)
         {
             return TryFindParameter(parameters, name, out result, default(T));
@@ -215,16 +275,12 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         /// Gets the value associated with the specified name.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="parameters"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
         internal static T FindParameter<T>(this IEnumerable<ParameterModel> parameters, string name)
         {
             ParameterModel parameter = parameters.FirstOrDefault(model => model.Name.Equals(name));
             if (parameter == null)
                 return default(T);
-            return (T) parameter.Value;
+            return (T)parameter.Value;
         }
 
         /// <summary>
@@ -236,6 +292,12 @@ namespace CaptchaMvc.Infrastructure
         internal static bool IsContain(this IEnumerable<ParameterModel> parameters, string name)
         {
             return parameters.Any(model => model.Name.Equals(name));
+        }
+
+        internal static void IsNotNullProperty(object propertyValue, string propertyName)
+        {
+            if (propertyValue == null)
+                throw new ArgumentNullException("value",string.Format("The property {0} cannot be a null", propertyName));
         }
 
         internal static void IsNotNull(object obj, string message)

@@ -6,40 +6,51 @@ using CaptchaMvc.Interface;
 namespace CaptchaMvc.Controllers
 {
     /// <summary>
-    /// The controller is responsible for creating and updating captcha.
+    ///     Represents the controller that is responsible for creating and updating captcha.
     /// </summary>
     public class DefaultCaptchaController : Controller
     {
+        #region Action methods
+
         /// <summary>
-        /// Generate a new captcha image.
+        ///     Generates a new captcha image.
         /// </summary>
         public virtual void Generate()
         {
+            var parameterContainer = new RequestParameterContainer(Request);
             try
             {
                 if (Request.UrlReferrer.AbsolutePath == Request.Url.AbsolutePath)
                     throw new InvalidOperationException();
-                IDrawingModel drawingModel = CaptchaUtils.CaptchaManager.GetDrawingModel(Request);
-                CaptchaUtils.BuilderProvider.WriteCaptchaImage(Response, drawingModel);
+
+                IDrawingModel drawingModel =
+                    CaptchaUtils.CaptchaManagerFactory(parameterContainer).GetDrawingModel(parameterContainer);
+                CaptchaUtils.BuilderProviderFactory(parameterContainer).WriteCaptchaImage(Response, drawingModel);
             }
             catch (Exception)
             {
-                CaptchaUtils.BuilderProvider.WriteErrorImage(Response);
+                CaptchaUtils.BuilderProviderFactory(parameterContainer).WriteErrorImage(Response);
             }
         }
 
         /// <summary>
-        /// Refresh a captcha.
+        ///     Refreshes a captcha.
         /// </summary>
-        /// <returns>The specified <see cref="ActionResult"/>.</returns>
+        /// <returns>
+        ///     An instance of <see cref="ActionResult" />.
+        /// </returns>
         public virtual ActionResult Refresh()
         {
+            var parameterContainer = new RequestParameterContainer(Request);
             if (Request.IsAjaxRequest())
             {
-                IUpdateInfoModel infoModel = CaptchaUtils.CaptchaManager.Update(Request);
-                return CaptchaUtils.BuilderProvider.RefreshCaptcha(infoModel);
+                IUpdateInfoModel updateInfoModel =
+                    CaptchaUtils.CaptchaManagerFactory(parameterContainer).Update(parameterContainer);
+                return CaptchaUtils.BuilderProviderFactory(parameterContainer).RefreshCaptcha(updateInfoModel);
             }
             return Redirect(Request.UrlReferrer.AbsolutePath);
         }
+
+        #endregion
     }
 }

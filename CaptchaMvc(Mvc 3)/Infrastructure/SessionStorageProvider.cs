@@ -87,7 +87,7 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Property
+        #region Properties
 
         /// <summary>
         /// Gets or sets the maximum values.

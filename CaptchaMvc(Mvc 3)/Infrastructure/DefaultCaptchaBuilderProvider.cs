@@ -10,39 +10,77 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// A base class for work with captcha.
+    ///     Provides a basic methods for create captcha.
     /// </summary>
     public class DefaultCaptchaBuilderProvider : ICaptchaBuilderProvider
     {
         #region Fields
 
         private static readonly byte[] ErrorBytes = CreateErrorBitmap();
+        private Func<IBuildInfoModel, ICaptchaBulder> _captchaBuilderFactory;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultCaptchaBuilderProvider" /> class.
+        /// </summary>
+        public DefaultCaptchaBuilderProvider()
+        {
+#pragma warning disable 612,618
+            CaptchaBuilderFactory = GetCaptchaBuilder;
+#pragma warning restore 612,618
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        ///     Gets or sets the factory to create <c>ICaptchaBulder</c> for the specified <see cref="IBuildInfoModel" />
+        /// </summary>
+        public Func<IBuildInfoModel, ICaptchaBulder> CaptchaBuilderFactory
+        {
+            get { return _captchaBuilderFactory; }
+            set
+            {
+                CaptchaUtils.IsNotNullProperty(value, "CaptchaBuilderFactory");
+                _captchaBuilderFactory = value;
+            }
+        }
 
         #endregion
 
         #region Implementation of ICaptchaBuilderProvider
 
         /// <summary>
-        /// Create a new captcha to the specified <see cref="IBuildInfoModel"/>.
+        ///     Creates a new captcha to the specified <see cref="IBuildInfoModel" />.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the captcha.</returns>
-        public virtual MvcHtmlString GenerateCaptcha(IBuildInfoModel buildInfoModel)
+        public virtual ICaptcha GenerateCaptcha(IBuildInfoModel buildInfoModel)
         {
             if (buildInfoModel == null) throw new ArgumentNullException("buildInfoModel");
-            return GetCaptchaBuilder(buildInfoModel).Build(buildInfoModel);
+            return CaptchaBuilderFactory(buildInfoModel).Build(buildInfoModel);
         }
 
         /// <summary>
-        /// Create a captcha image for specified <see cref="IDrawingModel"/> and write it in response.
+        ///     Creates a captcha image for specified <see cref="IDrawingModel" /> and write it in response.
         /// </summary>
-        /// <param name="response">The specified <see cref="HttpResponseBase"/>.</param>
-        /// <param name="drawingModel">The specified <see cref="IDrawingModel"/>.</param>
+        /// <param name="response">
+        ///     The specified <see cref="HttpResponseBase" />.
+        /// </param>
+        /// <param name="drawingModel">
+        ///     The specified <see cref="IDrawingModel" />.
+        /// </param>
         public virtual void WriteCaptchaImage(HttpResponseBase response, IDrawingModel drawingModel)
         {
             if (response == null) throw new ArgumentNullException("response");
             if (drawingModel == null) throw new ArgumentNullException("drawingModel");
-            using (Bitmap bitmap = CaptchaUtils.ImageGenerator.Generate(drawingModel.Text))
+            using (Bitmap bitmap = CaptchaUtils.ImageGeneratorFactory(drawingModel).Generate(drawingModel))
             {
                 response.ContentType = "image/gif";
                 bitmap.Save(response.OutputStream, ImageFormat.Gif);
@@ -50,9 +88,11 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Create a captcha error image and write it in response.
+        ///     Creates a captcha error image and write it in response.
         /// </summary>
-        /// <param name="response">The specified <see cref="HttpResponse"/>.</param>
+        /// <param name="response">
+        ///     The specified <see cref="HttpResponse" />.
+        /// </param>
         public virtual void WriteErrorImage(HttpResponseBase response)
         {
             if (response == null) throw new ArgumentNullException("response");
@@ -61,10 +101,14 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Generate a java-script to update the captcha.
+        ///     Generates a java-script to update the captcha.
         /// </summary>
-        /// <param name="updateInfo">The specified <see cref="IUpdateInfoModel"/>.</param>
-        /// <returns>The specified <see cref="ActionResult"/> to update the captcha.</returns>
+        /// <param name="updateInfo">
+        ///     The specified <see cref="IUpdateInfoModel" />.
+        /// </param>
+        /// <returns>
+        ///     An instance of <see cref="ActionResult" /> to update the captcha.
+        /// </returns>
         public virtual ActionResult RefreshCaptcha(IUpdateInfoModel updateInfo)
         {
             if (updateInfo == null)
@@ -78,13 +122,18 @@ $('#{2}').attr(""src"", ""{3}"");", updateInfo.TokenElementId,
 
         #endregion
 
-        #region Method
+        #region Methods
 
         /// <summary>
-        /// Get the <see cref="ICaptchaBulder"/> for build captcha with specified <see cref="IBuildInfoModel"/>.
+        ///     Gets the <see cref="ICaptchaBulder" /> for build captcha with specified <see cref="IBuildInfoModel" />.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
-        /// <returns>An instance of <see cref="ICaptchaBulder"/>.</returns>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
+        /// <returns>
+        ///     An instance of <see cref="ICaptchaBulder" />.
+        /// </returns>
+        [Obsolete("Use the CaptchaBuilderFactory property.")]
         protected virtual ICaptchaBulder GetCaptchaBuilder(IBuildInfoModel buildInfoModel)
         {
             if (buildInfoModel is DefaultBuildInfoModel)

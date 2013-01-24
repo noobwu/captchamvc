@@ -14,12 +14,16 @@ namespace CaptchaMvc.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PartialBuildInfoModel"/> class.
         /// </summary>
-        public PartialBuildInfoModel(HtmlHelper htmlHelper, IBuildInfoModel buildInfoModel, string partialViewName,
+        public PartialBuildInfoModel(HtmlHelper htmlHelper, IBuildInfoModel buildInfoModel, string partialViewName, string scriptPartialViewName,
                                      ViewDataDictionary viewData)
         {
+            if (htmlHelper == null) throw new ArgumentNullException("htmlHelper");
+            if (buildInfoModel == null) throw new ArgumentNullException("buildInfoModel");
+            if (partialViewName == null) throw new ArgumentNullException("partialViewName");
             HtmlHelper = htmlHelper;
             BuildInfoModel = buildInfoModel;
             PartialViewName = partialViewName;
+            ScriptPartialViewName = scriptPartialViewName;
             ViewData = viewData;
         }
 
@@ -38,9 +42,22 @@ namespace CaptchaMvc.Models
         public string PartialViewName { get; set; }
 
         /// <summary>
+        /// Gets the specified script-partial view name, if any.
+        /// </summary>
+        public string ScriptPartialViewName { get; set; }
+
+        /// <summary>
         /// Gets the specified <see cref="ViewDataDictionary"/>.
         /// </summary>
         public ViewDataDictionary ViewData { get; set; }
+
+        /// <summary>
+        ///     Gets the parameter container.
+        /// </summary>
+        public IParameterContainer ParameterContainer
+        {
+            get { throw new NotSupportedException(); }
+        }
 
         /// <summary>
         /// Gets the token parameter name.

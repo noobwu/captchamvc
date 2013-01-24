@@ -1,17 +1,47 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace CaptchaMvc.Interface
 {
     /// <summary>
-    /// Interface for implementing captcha image.
+    ///     Represents interface to generate captcha image.
     /// </summary>
     public interface IGenerateImage
     {
         /// <summary>
-        ///  Create a captcha image.
+        ///     Gets or sets the font color.
         /// </summary>
-        /// <param name="captchaText">The specified text for image.</param>
-        /// <returns>The captcha image.</returns>
-        Bitmap Generate(string captchaText);
+        Color FontColor { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the background color.
+        /// </summary>
+        Color Background { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the width.
+        /// </summary>
+        ushort Width { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the height.
+        /// </summary>
+        ushort Height { get; set; }
+
+        /// <summary>
+        ///     Gets the fonts.
+        /// </summary>
+        IList<FontFamily> Fonts { get; }
+
+        /// <summary>
+        ///     Creates a captcha image using the specified <see cref="IDrawingModel" />.
+        /// </summary>
+        /// <param name="drawingModel">
+        ///     The specified <see cref="IDrawingModel" />.
+        /// </param>
+        /// <returns>
+        ///     An instance of <see cref="Bitmap" />.
+        /// </returns>
+        Bitmap Generate(IDrawingModel drawingModel);
     }
 }

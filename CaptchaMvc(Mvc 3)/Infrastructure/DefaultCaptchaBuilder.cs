@@ -3,14 +3,54 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using CaptchaMvc.Interface;
+using CaptchaMvc.Models;
 
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Default implementation of a <see cref="ICaptchaBulder"/>.
+    ///     Default implementation of a <see cref="ICaptchaBulder" />.
     /// </summary>
     public class DefaultCaptchaBuilder : ICaptchaBulder
     {
+        #region Nested types
+
+        /// <summary>
+        ///     Represents the model for refresh button.
+        /// </summary>
+        protected sealed class RefreshButton
+        {
+            #region Fields
+
+            /// <summary>
+            ///     Gets the markup.
+            /// </summary>
+            public readonly string Markup;
+
+            /// <summary>
+            ///     Gets the script.
+            /// </summary>
+            public readonly string Script;
+
+            #endregion
+
+            #region Constructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
+            /// </summary>
+            public RefreshButton(string markup, string script)
+            {
+                if (markup == null) throw new ArgumentNullException("markup");
+                if (script == null) throw new ArgumentNullException("script");
+                Markup = markup;
+                Script = script;
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         #region Fields
 
         private const string CaptchaFormat = @"
@@ -27,20 +67,22 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
         #region Implementation of ICaptchaBulder
 
         /// <summary>
-        /// Create a new captcha to the specified <see cref="IBuildInfoModel"/>.
+        ///     Creates a new captcha using the specified <see cref="IBuildInfoModel" />.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
-        /// <returns>The html string with the captcha.</returns>
-        public virtual MvcHtmlString Build(IBuildInfoModel buildInfoModel)
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
+        /// <returns>An instance of <see cref="ICaptcha"/>.</returns>
+        public virtual ICaptcha Build(IBuildInfoModel buildInfoModel)
         {
             string captchaFormat = GenerateCaptchaImage(buildInfoModel);
             string generateTokenElement = GenerateTokenElement(buildInfoModel);
             string inputElement = GenerateInputElement(buildInfoModel);
-            string refreshButton = GenerateRefreshButton(buildInfoModel);
-            return
-                MvcHtmlString.Create(string.Format("{0}{1} <br/>{2}<br/>{3}<br/>{4}", captchaFormat,
-                                                   generateTokenElement, refreshButton,
-                                                   buildInfoModel.InputText, inputElement));
+            RefreshButton refreshButton = GenerateRefreshButton(buildInfoModel);
+            string markup = string.Format("{0}{1} <br/>{2}<br/>{3}<br/>{4}", captchaFormat,
+                                          generateTokenElement, refreshButton.Markup,
+                                          buildInfoModel.InputText, inputElement);
+            return new CaptchaModel(markup, refreshButton.Script);
         }
 
         #endregion
@@ -48,9 +90,11 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
         #region Methods
 
         /// <summary>
-        /// Create a html string to represent the image.
+        ///     Creates a html string to represent the image.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the image.</returns>
         protected virtual string GenerateCaptchaImage(IBuildInfoModel buildInfoModel)
         {
@@ -58,9 +102,11 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
         }
 
         /// <summary>
-        /// Create a html string to represent the token element.
+        ///     Creates a html string to represent the token element.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the token element.</returns>
         protected virtual string GenerateTokenElement(IBuildInfoModel buildInfoModel)
         {
@@ -69,9 +115,11 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
         }
 
         /// <summary>
-        /// Create a html string to represent the input element.
+        ///     Creates a html string to represent the input element.
         /// </summary>
-        /// <param name="buildInfo">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfo">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the input element.</returns>
         protected virtual string GenerateInputElement(IBuildInfoModel buildInfo)
         {
@@ -84,16 +132,25 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
             attributes.Add("autocomplete", "off");
             attributes.Add("autocorrect", "off");
             MvcHtmlString input = buildInfo.HtmlHelper.TextBox(buildInfo.InputElementId, null, attributes);
-            MvcHtmlString validationMessage = buildInfo.HtmlHelper.ValidationMessage(buildInfo.InputElementId);
+
+            var validationMessage = string.Empty;
+            bool addSpan;
+            if (buildInfo.ParameterContainer.TryGet(DefaultCaptchaManager.IsNeedValidationSpanAttribute, out addSpan) && addSpan)
+                validationMessage = string.Format(
+                     @"<span class=""field-validation-valid"" data-valmsg-for=""{0}"" data-valmsg-replace=""true""></span>",
+                     buildInfo.InputElementId);
+
             return string.Format("{0}<br/>{1}", input, validationMessage);
         }
 
         /// <summary>
-        /// Create a html string to represent the refresh button element.
+        ///     Creates a html string to represent the refresh button element.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the refresh button element.</returns>
-        protected virtual string GenerateRefreshButton(IBuildInfoModel buildInfoModel)
+        protected virtual RefreshButton GenerateRefreshButton(IBuildInfoModel buildInfoModel)
         {
             string id = Guid.NewGuid().ToString("N");
             string functionName = string.Format("______{0}________()", Guid.NewGuid().ToString("N"));
@@ -103,9 +160,10 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
             tagA.Attributes.Add("style", "display:none;");
             tagA.SetInnerText(buildInfoModel.RefreshButtonText);
             tagA.Attributes.Add("id", id);
-            string updateScript = string.Format(UpdateScript, id, buildInfoModel.RefreshUrl, buildInfoModel.TokenParameterName,
+            string updateScript = string.Format(UpdateScript, id, buildInfoModel.RefreshUrl,
+                                                buildInfoModel.TokenParameterName,
                                                 buildInfoModel.TokenElementId, functionName);
-            return string.Format("{0} {1}", updateScript, tagA);
+            return new RefreshButton(tagA.ToString(), updateScript);
         }
 
         #endregion

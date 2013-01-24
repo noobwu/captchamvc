@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
 {
@@ -12,11 +13,11 @@ namespace CaptchaMvc.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultBuildInfoModel"/> class.
         /// </summary>
-        public DefaultBuildInfoModel(string tokenParameterName, string requiredMessage, bool isRequired,
+        public DefaultBuildInfoModel(IParameterContainer parameterContainer, string tokenParameterName, string requiredMessage, bool isRequired,
                                      string refreshButtonText, string inputText, HtmlHelper htmlHelper,
                                      string inputElementId, string imageElementId, string tokenElementId,
                                      string refreshUrl, string imageUrl, string tokenValue)
-            : base(
+            : base(parameterContainer,
                 tokenParameterName, requiredMessage, isRequired, refreshButtonText, inputText, htmlHelper,
                 inputElementId, imageElementId, tokenElementId, refreshUrl, imageUrl, tokenValue)
         {

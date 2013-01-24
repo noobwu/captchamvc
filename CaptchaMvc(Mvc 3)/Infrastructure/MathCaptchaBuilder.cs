@@ -6,7 +6,7 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Implementation of a <see cref="ICaptchaBulder"/> for build math captcha.
+    ///     Implementation of a <see cref="ICaptchaBulder" /> for build a math captcha.
     /// </summary>
     public class MathCaptchaBuilder : DefaultCaptchaBuilder
     {
@@ -22,11 +22,13 @@ function {5} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val(), {4}: 
         #region Overrides of DefaultCaptchaBuilder
 
         /// <summary>
-        /// Create a html string to represent the refresh button element.
+        ///     Creates a html string to represent the refresh button element.
         /// </summary>
-        /// <param name="buildInfoModel">The specified <see cref="IBuildInfoModel"/>.</param>
+        /// <param name="buildInfoModel">
+        ///     The specified <see cref="IBuildInfoModel" />.
+        /// </param>
         /// <returns>The html string with the refresh button element.</returns>
-        protected override string GenerateRefreshButton(IBuildInfoModel buildInfoModel)
+        protected override RefreshButton GenerateRefreshButton(IBuildInfoModel buildInfoModel)
         {
             var infoModel = buildInfoModel as MathBuildInfoModel;
             if (infoModel == null)
@@ -42,7 +44,7 @@ function {5} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val(), {4}: 
             tagA.Attributes.Add("id", id);
             string updateScript = string.Format(UpdateScript, id, infoModel.RefreshUrl, infoModel.TokenParameterName,
                                                 infoModel.TokenElementId, infoModel.MathParamterName, functionName);
-            return string.Format("{0} {1}", updateScript, tagA);
+            return new RefreshButton(tagA.ToString(), updateScript);
         }
 
         #endregion

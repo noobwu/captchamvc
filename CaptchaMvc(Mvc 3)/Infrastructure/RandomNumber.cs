@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Generates the random numbers.
+    ///     Helper class to generates the random numbers.
     /// </summary>
     public static class RandomNumber
     {
@@ -15,10 +15,10 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Method
+        #region Methods
 
         /// <summary>
-        /// Generate a positive random number.
+        ///     Generates a positive random number.
         /// </summary>
         private static int Next()
         {
@@ -28,7 +28,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Generate a positive random number.
+        ///     Generates a positive random number.
         /// </summary>
         public static int Next(int max)
         {
@@ -36,7 +36,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Generate a positive random number.
+        ///     Generates a positive random number.
         /// </summary>
         public static int Next(int min, int max)
         {

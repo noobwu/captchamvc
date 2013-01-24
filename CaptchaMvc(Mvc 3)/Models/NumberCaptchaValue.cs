@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -7,12 +8,14 @@ namespace CaptchaMvc.Models
     ///     Represents the base model for storing number ​​captcha values.
     /// </summary>
     [Serializable]
+    [DataContract]
     public class NumberCaptchaValue : CaptchaValueBase
     {
         #region Fields
 
-        private string _captchaText;
-        private int _value;
+        [DataMember] private string _captchaText;
+
+        [DataMember] private int _value;
 
         #endregion
 
@@ -60,7 +63,9 @@ namespace CaptchaMvc.Models
         ///     Determines whether the current captcha value is equal for the <c>inputText</c>.
         /// </summary>
         /// <param name="inputText"> The specified input text. </param>
-        /// <returns> <c>True</c> if the value is equals; otherwise, <c>false</c> . </returns>
+        /// <returns>
+        ///     <c>True</c> if the value is equals; otherwise, <c>false</c> .
+        /// </returns>
         public override bool IsEqual(string inputText)
         {
             int input;

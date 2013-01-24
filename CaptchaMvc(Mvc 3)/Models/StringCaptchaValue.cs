@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -7,12 +8,18 @@ namespace CaptchaMvc.Models
     ///     Represents the base model for storing ​string ​captcha values.
     /// </summary>
     [Serializable]
+    [DataContract]
     public class StringCaptchaValue : CaptchaValueBase
     {
         #region Fields
 
+        [DataMember]
         private string _captchaText;
+
+        [DataMember]
         private StringComparison _stringComparison;
+
+        [DataMember]
         private string _value;
 
         #endregion

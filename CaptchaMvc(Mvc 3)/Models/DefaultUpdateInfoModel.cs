@@ -32,22 +32,22 @@ namespace CaptchaMvc.Models
         /// <summary>
         /// Gets the token element id in DOM.
         /// </summary>
-        public string TokenElementId { get; private set; }
+        public string TokenElementId { get; set; }
 
         /// <summary>
         /// Gets the image element id in DOM.
         /// </summary>
-        public string ImageElementId { get; private set; }
+        public string ImageElementId { get; set; }
 
         /// <summary>
         /// Gets the url with captcha image.
         /// </summary>
-        public string ImageUrl { get; private set; }
+        public string ImageUrl { get; set; }
 
         /// <summary>
         /// Gets the token value.
         /// </summary>
-        public string TokenValue { get; private set; }
+        public string TokenValue { get; set; }
 
         #endregion
     }

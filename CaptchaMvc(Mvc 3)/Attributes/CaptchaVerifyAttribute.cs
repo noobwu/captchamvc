@@ -7,14 +7,14 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Attributes
 {
     /// <summary>
-    /// Attribute to validate the captcha.
+    ///     Represents the attribute to validate the captcha.
     /// </summary>
     public class CaptchaVerifyAttribute : ActionFilterAttribute
     {
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CaptchaVerifyAttribute"/> class.
+        ///     Initializes a new instance of the <see cref="CaptchaVerifyAttribute" /> class.
         /// </summary>
         public CaptchaVerifyAttribute(string textError)
         {
@@ -22,7 +22,7 @@ namespace CaptchaMvc.Attributes
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CaptchaVerifyAttribute"/> class.
+        ///     Initializes a new instance of the <see cref="CaptchaVerifyAttribute" /> class.
         /// </summary>
         public CaptchaVerifyAttribute(string resourceName, Type resourceType)
         {
@@ -35,15 +35,15 @@ namespace CaptchaMvc.Attributes
 
         #endregion
 
-        #region Property
+        #region Properties
 
         /// <summary>
-        /// Gets or sets an error message to associate with a validation control if validation fails.
+        ///     Gets or sets an error message to associate with a validation control if validation fails.
         /// </summary>
         public string TextError { get; set; }
 
         /// <summary>
-        /// Gets or sets a <see cref="MethodInfo"/> for access to the resource message.
+        ///     Gets or sets a <see cref="MethodInfo" /> for access to the resource message.
         /// </summary>
         protected MethodInfo ResourceAccessor { get; set; }
 
@@ -52,13 +52,17 @@ namespace CaptchaMvc.Attributes
         #region Overrides of ActionFilterAttribute
 
         /// <summary>
-        /// Called by the ASP.NET MVC framework before the action method executes.
+        ///     Called by the ASP.NET MVC framework before the action method executes.
         /// </summary>
         /// <param name="filterContext">The filter context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            CaptchaUtils.ValidateCaptcha(filterContext.Controller,
-                                         new ParameterModel(DefaultCaptchaManager.ErrorAttribute, GetErrorMessage()));
+            CaptchaUtils.ValidateCaptcha(filterContext.Controller, new[]
+                                                                       {
+                                                                           new ParameterModel(
+                                                                               DefaultCaptchaManager.ErrorAttribute,
+                                                                               GetErrorMessage())
+                                                                       });
         }
 
         #endregion
@@ -87,7 +91,7 @@ namespace CaptchaMvc.Attributes
         }
 
         /// <summary>
-        /// Returns an error message.
+        ///     Returns an error message.
         /// </summary>
         /// <returns>The error message.</returns>
         protected virtual string GetErrorMessage()
