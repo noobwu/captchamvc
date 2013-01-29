@@ -1,4 +1,5 @@
 ﻿using System;
+using CaptchaMvc.Infrastructure;
 
 namespace CaptchaMvc.Models
 {
@@ -14,8 +15,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public ParameterModel(string name, object value)
         {
-            if (name == null)
-                throw new ArgumentNullException("name");
+            Validate.ArgumentNotNullOrEmpty(name, "name");
             Name = name;
             Value = value;
         }

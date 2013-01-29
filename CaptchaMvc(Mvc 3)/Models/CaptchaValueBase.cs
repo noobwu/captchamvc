@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -40,8 +41,7 @@ namespace CaptchaMvc.Models
         /// <param name="serializeState"> The specified serialize state. </param>
         public void Deserialize(string serializeState)
         {
-            if (serializeState == null)
-                throw new ArgumentNullException("serializeState");
+            Validate.ArgumentNotNull(serializeState, "serializeState");
             string[] strings = serializeState.Split(new[] {GetSeparator()}, StringSplitOptions.RemoveEmptyEntries);
             if (strings.Length < 2)
                 throw new ArgumentException(

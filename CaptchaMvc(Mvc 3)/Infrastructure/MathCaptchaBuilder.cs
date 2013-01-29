@@ -38,7 +38,7 @@ function {5} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val(), {4}: 
             string functionName = string.Format("______{0}________()", Guid.NewGuid().ToString("N"));
             var tagA = new TagBuilder("a");
             tagA.Attributes.Add("onclick", functionName);
-            tagA.Attributes.Add("href", "#" + id);
+            tagA.Attributes.Add("href", "#" + buildInfoModel.ImageElementId);
             tagA.Attributes.Add("style", "display:none;");
             tagA.SetInnerText(buildInfoModel.RefreshButtonText);
             tagA.Attributes.Add("id", id);

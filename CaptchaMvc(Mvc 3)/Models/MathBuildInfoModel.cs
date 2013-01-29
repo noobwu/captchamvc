@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -22,7 +23,7 @@ namespace CaptchaMvc.Models
                 tokenParameterName, requiredMessage, isRequired, refreshButtonText, inputText, htmlHelper,
                 inputElementId, imageElementId, tokenElementId, refreshUrl, imageUrl, tokenValue)
         {
-            if (mathParamterName == null) throw new ArgumentNullException("mathParamterName");
+            Validate.ArgumentNotNullOrEmpty(mathParamterName, "mathParamterName");
             MathParamterName = mathParamterName;
         }
 

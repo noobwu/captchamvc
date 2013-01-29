@@ -104,8 +104,7 @@ namespace CaptchaMvc.HtmlHelpers
                                        [AspMvcPartialView] string partialViewName,
                                        ViewDataDictionary viewData = null, params ParameterModel[] parameters)
         {
-            if (string.IsNullOrEmpty(partialViewName))
-                throw new ArgumentNullException("partialViewName");
+            Validate.ArgumentNotNullOrEmpty(partialViewName, "partialViewName");
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.LengthAttribute, length));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
@@ -133,10 +132,8 @@ namespace CaptchaMvc.HtmlHelpers
                                        [AspMvcPartialView] string scriptPartialViewName,
                                        ViewDataDictionary viewData = null, params ParameterModel[] parameters)
         {
-            if (string.IsNullOrEmpty(partialViewName))
-                throw new ArgumentNullException("partialViewName");
-            if (string.IsNullOrEmpty(scriptPartialViewName))
-                throw new ArgumentNullException("scriptPartialViewName");
+            Validate.ArgumentNotNullOrEmpty(partialViewName, "partialViewName");
+            Validate.ArgumentNotNullOrEmpty(scriptPartialViewName, "scriptPartialViewName");
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.LengthAttribute, length));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
@@ -230,8 +227,7 @@ namespace CaptchaMvc.HtmlHelpers
         public static ICaptcha MathCaptcha(this HtmlHelper htmlHelper, [AspMvcPartialView] string partialViewName,
                                            ViewDataDictionary viewData = null, params ParameterModel[] parameters)
         {
-            if (string.IsNullOrEmpty(partialViewName))
-                throw new ArgumentNullException("partialViewName");
+            Validate.ArgumentNotNullOrEmpty(partialViewName, "partialViewName");
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.MathCaptchaAttribute, true));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
@@ -258,10 +254,8 @@ namespace CaptchaMvc.HtmlHelpers
                                            ViewDataDictionary viewData = null,
                                            params ParameterModel[] parameters)
         {
-            if (string.IsNullOrEmpty(partialViewName))
-                throw new ArgumentNullException("partialViewName");
-            if (scriptPartialViewName == null) 
-                throw new ArgumentNullException("scriptPartialViewName");
+            Validate.ArgumentNotNullOrEmpty(partialViewName, "partialViewName");
+            Validate.ArgumentNotNullOrEmpty(scriptPartialViewName, "scriptPartialViewName");
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.MathCaptchaAttribute, true));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
@@ -305,6 +299,65 @@ namespace CaptchaMvc.HtmlHelpers
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.ErrorAttribute, errorText));
             return CaptchaUtils.ValidateCaptcha(controllerBase, list);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ICaptchaManager"/> using the specified <see cref="ControllerBase"/>.
+        /// </summary>
+        /// <param name="controllerBase">The specified <see cref="ControllerBase"/>.</param>
+        /// <returns>An instance of <see cref="ICaptchaManager"/>.</returns>
+        public static ICaptchaManager GetCaptchaManager(this ControllerBase controllerBase)
+        {
+            return CaptchaUtils.CaptchaManagerFactory(
+                new RequestParameterContainer(controllerBase.ControllerContext.HttpContext.Request));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ICaptchaBuilderProvider"/> using the specified <see cref="ControllerBase"/>.
+        /// </summary>
+        /// <param name="controllerBase">The specified <see cref="ControllerBase"/>.</param>
+        /// <returns>An instance of <see cref="ICaptchaBuilderProvider"/>.</returns>
+        public static ICaptchaBuilderProvider GetCaptchaBuilderProvider(this ControllerBase controllerBase)
+        {
+            return CaptchaUtils.BuilderProviderFactory(
+                new RequestParameterContainer(controllerBase.ControllerContext.HttpContext.Request));
+        }
+
+        /// <summary>
+        ///     Creates a new captcha values with the specified arguments.
+        /// </summary>
+        /// <param name="controller">
+        ///     The specified <see cref="ControllerBase" />.
+        /// </param>
+        /// <param name="length">The specified length of characters.</param>
+        /// <param name="parameters">The specified parameters, if any.</param>
+        /// <returns>
+        ///     An instance of <see cref="IUpdateInfoModel" />.
+        /// </returns>
+        public static IUpdateInfoModel GenerateCaptchaValue(this ControllerBase controller, int length, params ParameterModel[] parameters)
+        {
+            List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
+            list.Add(new ParameterModel(DefaultCaptchaManager.LengthAttribute, length));
+            var container = new CombinedParameterContainer(new ParameterModelContainer(list), new RequestParameterContainer(controller.ControllerContext.HttpContext.Request));
+            return controller.GetCaptchaManager().GenerateNew(controller, container);
+        }
+
+        /// <summary>
+        ///     Creates a new math captcha values with the specified arguments.
+        /// </summary>
+        /// <param name="controller">
+        ///     The specified <see cref="ControllerBase" />.
+        /// </param>
+        /// <param name="parameters">The specified parameters, if any.</param>
+        /// <returns>
+        ///     An instance of <see cref="IUpdateInfoModel" />.
+        /// </returns>
+        public static IUpdateInfoModel GenerateMathCaptchaValue(this ControllerBase controller, params ParameterModel[] parameters)
+        {
+            List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
+            list.Add(new ParameterModel(DefaultCaptchaManager.MathCaptchaAttribute, true));
+            var container = new CombinedParameterContainer(new ParameterModelContainer(list), new RequestParameterContainer(controller.ControllerContext.HttpContext.Request));
+            return controller.GetCaptchaManager().GenerateNew(controller, container);
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -24,7 +25,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public CaptchaModel(string markup, string script)
         {
-            if (markup == null) throw new ArgumentNullException("markup");
+            Validate.ArgumentNotNull(markup, "markup");
             _markup = markup;
             if (script == null)
                 script = string.Empty;

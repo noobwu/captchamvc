@@ -1,4 +1,5 @@
 ﻿using System;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -15,10 +16,10 @@ namespace CaptchaMvc.Models
         /// </summary>
         public DefaultUpdateInfoModel(string tokenElementId, string tokenValue, string imageUrl, string imageElementId)
         {
-            if (tokenElementId == null) throw new ArgumentNullException("tokenElementId");
-            if (tokenValue == null) throw new ArgumentNullException("tokenValue");
-            if (imageUrl == null) throw new ArgumentNullException("imageUrl");
-            if (imageElementId == null) throw new ArgumentNullException("imageElementId");
+            Validate.ArgumentNotNullOrEmpty(tokenElementId, "tokenElementId");
+            Validate.ArgumentNotNullOrEmpty(tokenValue, "tokenValue");
+            Validate.ArgumentNotNullOrEmpty(imageUrl, "imageUrl");
+            Validate.ArgumentNotNullOrEmpty(imageElementId, "imageElementId");
             TokenElementId = tokenElementId;
             TokenValue = tokenValue;
             ImageUrl = imageUrl;

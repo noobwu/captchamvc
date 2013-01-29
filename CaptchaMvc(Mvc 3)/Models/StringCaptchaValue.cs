@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -38,10 +39,8 @@ namespace CaptchaMvc.Models
         /// </summary>
         public StringCaptchaValue(string captchaText, string value, bool ignoreCase)
         {
-            if (captchaText == null)
-                throw new ArgumentNullException("captchaText");
-            if (value == null)
-                throw new ArgumentNullException("value");
+            Validate.ArgumentNotNullOrEmpty(captchaText, "captchaText");
+            Validate.ArgumentNotNull(value, "value");
             _captchaText = captchaText;
             _value = value;
             _stringComparison = ignoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;

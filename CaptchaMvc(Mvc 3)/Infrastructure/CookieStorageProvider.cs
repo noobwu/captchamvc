@@ -74,12 +74,9 @@ namespace CaptchaMvc.Infrastructure
         /// <param name="salt">The specified salt to encrypt cookie</param>
         public CookieStorageProvider(int expiresMinutes, string cookieName, string password, byte[] salt)
         {
-            if (cookieName == null)
-                throw new ArgumentNullException("cookieName");
-            if (password == null)
-                throw new ArgumentNullException("password");
-            if (salt == null)
-                throw new ArgumentNullException("salt");
+            Validate.ArgumentNotNullOrEmpty(cookieName, "cookieName");
+            Validate.ArgumentNotNullOrEmpty(password, "password");
+            Validate.ArgumentNotNull(salt, "salt");
             ExpiresMinutes = expiresMinutes;
             _salt = salt;
             _password = password;
@@ -96,8 +93,8 @@ namespace CaptchaMvc.Infrastructure
         /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/></param>
         public virtual void Add(KeyValuePair<string, ICaptchaValue> captchaPair)
         {
-            if (captchaPair.Value == null)
-                throw new ArgumentNullException("captchaPair");
+            Validate.ArgumentNotNull(captchaPair, "captchaPair");
+            Validate.ArgumentNotNull(captchaPair.Value, "captchaPair");
             string drawingKey = CookieName + DrawingKey;
             HttpCookie httpCookieDrawing = HttpContext.Current.Request.Cookies[drawingKey] ??
                                            new HttpCookie(drawingKey);
@@ -126,8 +123,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
         public virtual ICaptchaValue GetDrawingValue(string token)
         {
-            if (token == null)
-                throw new ArgumentNullException("token");
+            Validate.ArgumentNotNullOrEmpty(token, "token");
             return GetFromCookie(CookieName + DrawingKey, token);
         }
 
@@ -138,8 +134,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
         public virtual ICaptchaValue GetValidationValue(string token)
         {
-            if (token == null)
-                throw new ArgumentNullException("token");
+            Validate.ArgumentNotNullOrEmpty(token, "token");
             return GetFromCookie(CookieName, token);
         }
 
@@ -155,7 +150,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _cookieName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property CookieName can not be null.");
+                Validate.PropertyNotNullOrEmpty(value, "CookieName");
                 _cookieName = value;
             }
         }
@@ -173,7 +168,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _password; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property Password can not be null.");
+                Validate.PropertyNotNullOrEmpty(value, "Password");
                 _password = value;
             }
         }
@@ -186,7 +181,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _salt; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property Salt can not be null.");
+                Validate.PropertyNotNull(value, "Salt");
                 _salt = value;
             }
         }
@@ -227,8 +222,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>The result string.</returns>
         protected virtual string Serialize(ICaptchaValue captchaValue)
         {
-            if (captchaValue == null)
-                throw new ArgumentNullException("captchaValue");
+            Validate.ArgumentNotNull(captchaValue, "captchaValue");
             using (var pdb = new Rfc2898DeriveBytes(Password, Salt))
             {
                 string value = captchaValue.GetType().FullName + Separator + captchaValue.Serialize();
@@ -256,8 +250,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>The result <see cref="ICaptchaValue"/>.</returns>
         protected virtual ICaptchaValue Deserialize(string value)
         {
-            if (value == null)
-                throw new ArgumentNullException("value");
+            Validate.ArgumentNotNullOrEmpty(value, "value");
             byte[] inputBytes = Convert.FromBase64String(value);
             using (var pdb = new Rfc2898DeriveBytes(Password, Salt))
             {

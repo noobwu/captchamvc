@@ -101,6 +101,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\SessionStorageProvider.cs">
       <Link>Infrastructure\SessionStorageProvider.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\Validate.cs">
+      <Link>Infrastructure\Validate.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IBuildInfoModel.cs">
       <Link>Interface\IBuildInfoModel.cs</Link>
     </Compile>

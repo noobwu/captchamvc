@@ -14,6 +14,7 @@ namespace CaptchaMvc.Infrastructure
     {
         #region Fields
 
+        private static readonly object Locker = new object();
         private const string SessionValidateKey = "____________SessionValidateKey_____________";
         private const string SessionDrawingKey = "____________SessionDrawingKey_____________";
 
@@ -24,7 +25,8 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionStorageProvider"/> class.
         /// </summary>
-        public SessionStorageProvider() : this(10)
+        public SessionStorageProvider()
+            : this(10)
         {
         }
 
@@ -47,8 +49,7 @@ namespace CaptchaMvc.Infrastructure
         /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/></param>
         public virtual void Add(KeyValuePair<string, ICaptchaValue> captchaPair)
         {
-            if (captchaPair.Value == null)
-                throw new ArgumentNullException("captchaPair");
+            Validate.ArgumentNotNull(captchaPair.Value, "captchaPair");
             ClearIfNeed(DrawingKeys);
             ClearIfNeed(ValidateKeys);
             DrawingKeys.Add(captchaPair);
@@ -62,8 +63,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
         public virtual ICaptchaValue GetDrawingValue(string token)
         {
-            if (token == null)
-                throw new ArgumentNullException("token");
+            Validate.ArgumentNotNullOrEmpty(token, "token");
             ICaptchaValue value;
             if (DrawingKeys.TryGetValue(token, out value))
                 DrawingKeys.Remove(token);
@@ -77,8 +77,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
         public virtual ICaptchaValue GetValidationValue(string token)
         {
-            if (token == null)
-                throw new ArgumentNullException("token");
+            Validate.ArgumentNotNullOrEmpty(token, "token");
             ICaptchaValue value;
             if (ValidateKeys.TryGetValue(token, out value))
                 ValidateKeys.Remove(token);
@@ -128,8 +127,14 @@ namespace CaptchaMvc.Infrastructure
             var dictionary = HttpContext.Current.Session[key] as IDictionary<string, ICaptchaValue>;
             if (dictionary == null)
             {
-                dictionary = new ConcurrentDictionary<string, ICaptchaValue>();
-                HttpContext.Current.Session[key] = dictionary;
+                lock (Locker)
+                {
+                    if (dictionary == null)
+                    {
+                        dictionary = new ConcurrentDictionary<string, ICaptchaValue>();
+                        HttpContext.Current.Session[key] = dictionary;
+                    }
+                }
             }
             return dictionary;
         }

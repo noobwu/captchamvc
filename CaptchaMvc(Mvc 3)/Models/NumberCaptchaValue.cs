@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -33,8 +34,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public NumberCaptchaValue(string captchaText, int value)
         {
-            if (captchaText == null)
-                throw new ArgumentNullException("captchaText");
+            Validate.ArgumentNotNullOrEmpty(captchaText, "captchaText");
             _captchaText = captchaText;
             _value = value;
         }

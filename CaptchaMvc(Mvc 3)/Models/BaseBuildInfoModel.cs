@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -21,12 +22,12 @@ namespace CaptchaMvc.Models
                                      string refreshUrl,
                                      string imageUrl, string tokenValue)
         {
-            if (parameterContainer == null) throw new ArgumentNullException("parameterContainer");
-            if (tokenParameterName == null) throw new ArgumentNullException("tokenParameterName");
-            if (inputElementId == null) throw new ArgumentNullException("inputElementId");
-            if (imageElementId == null) throw new ArgumentNullException("imageElementId");
-            if (tokenElementId == null) throw new ArgumentNullException("tokenElementId");
-            if (tokenValue == null) throw new ArgumentNullException("tokenValue");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
+            Validate.ArgumentNotNullOrEmpty(tokenParameterName, "tokenParameterName");
+            Validate.ArgumentNotNullOrEmpty(inputElementId, "inputElementId");
+            Validate.ArgumentNotNullOrEmpty(imageElementId, "imageElementId");
+            Validate.ArgumentNotNullOrEmpty(tokenElementId, "tokenElementId");
+            Validate.ArgumentNotNullOrEmpty(tokenValue, "tokenValue");
             ParameterContainer = parameterContainer;
             TokenParameterName = tokenParameterName;
             RequiredMessage = requiredMessage;

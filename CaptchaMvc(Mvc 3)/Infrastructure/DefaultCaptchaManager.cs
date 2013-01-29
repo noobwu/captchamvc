@@ -47,15 +47,12 @@ namespace CaptchaMvc.Infrastructure
                                      string inputElementName, string imageElementName,
                                      string tokenElementName)
         {
-            if (storageProvider == null) throw new ArgumentNullException("storageProvider");
-            if (string.IsNullOrEmpty(tokenParameterName))
-                throw new ArgumentNullException("tokenParameterName");
-            if (string.IsNullOrEmpty(inputElementName))
-                throw new ArgumentNullException("inputElementName");
-            if (string.IsNullOrEmpty(imageElementName))
-                throw new ArgumentNullException("imageElementName");
-            if (string.IsNullOrEmpty(tokenElementName))
-                throw new ArgumentNullException("tokenElementName");
+            Validate.ArgumentNotNull(storageProvider, "storageProvider");
+            Validate.ArgumentNotNullOrEmpty(tokenParameterName, "tokenParameterName");
+            Validate.ArgumentNotNullOrEmpty(inputElementName, "inputElementName");
+            Validate.ArgumentNotNullOrEmpty(imageElementName, "imageElementName");
+            Validate.ArgumentNotNullOrEmpty(tokenElementName, "tokenElementName");
+
             StorageProvider = storageProvider;
             TokenParameterName = tokenParameterName;
             InputElementName = inputElementName;
@@ -143,7 +140,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _getImageUrl; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "ImageUrlFactory");
+                Validate.PropertyNotNull(value, "ImageUrlFactory");
                 _getImageUrl = value;
             }
         }
@@ -156,7 +153,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _getRefreshUrl; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "RefreshUrlFactory");
+                Validate.PropertyNotNull(value, "RefreshUrlFactory");
                 _getRefreshUrl = value;
             }
         }
@@ -169,7 +166,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _mathCaptchaPairFactory; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "MathCaptchaPairFactory");
+                Validate.PropertyNotNull(value, "MathCaptchaPairFactory");
                 _mathCaptchaPairFactory = value;
             }
         }
@@ -182,7 +179,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _plainCaptchaPairFactory; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "PlainCaptchaPairFactory");
+                Validate.PropertyNotNull(value, "PlainCaptchaPairFactory");
                 _plainCaptchaPairFactory = value;
             }
         }
@@ -195,7 +192,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _drawingModelFactory; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "DrawingModelFactory");
+                Validate.PropertyNotNull(value, "DrawingModelFactory");
                 _drawingModelFactory = value;
             }
         }
@@ -208,7 +205,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _getCharacters; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "CharactersFactory");
+                Validate.PropertyNotNull(value, "CharactersFactory");
                 _getCharacters = value;
             }
         }
@@ -221,7 +218,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _tokenParameterName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property TokenParameterName cannot be null.");
+                Validate.PropertyNotNullOrEmpty(value, "TokenParameterName");
                 _tokenParameterName = value;
             }
         }
@@ -234,7 +231,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _inputElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property InputElementName cannot be null.");
+                Validate.PropertyNotNullOrEmpty(value, "InputElementName");
                 _inputElementName = value;
             }
         }
@@ -247,7 +244,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _imageElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property ImageElementName cannot be null.");
+                Validate.PropertyNotNullOrEmpty(value, "ImageElementName");
                 _imageElementName = value;
             }
         }
@@ -260,7 +257,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _tokenElementName; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property TokenElementName cannot be null.");
+                Validate.PropertyNotNullOrEmpty(value, "TokenElementName");
                 _tokenElementName = value;
             }
         }
@@ -382,19 +379,22 @@ namespace CaptchaMvc.Infrastructure
         [Obsolete("Use the MathCaptchaPairFactory property.")]
         protected virtual KeyValuePair<string, ICaptchaValue> GenerateMathCaptcha()
         {
-            int first = RandomNumber.Next(100, 1000);
-            int second = RandomNumber.Next(1, 100);
+            int first, second;
             string text;
             int result;
             int next = RandomNumber.Next(0, 1);
             switch (next)
             {
                 case 0:
-                    text = string.Format("{0} + {1} = ?", first, second);
+                    first = RandomNumber.Next(1, 50);
+                    second = RandomNumber.Next(1, 50);
+                    text = string.Format("{0}+{1}=?", first, second);
                     result = first + second;
                     break;
                 case 1:
-                    text = string.Format("{0} - {1} = ?", first, second);
+                    first = RandomNumber.Next(50, 99);
+                    second = RandomNumber.Next(1, 49);
+                    text = string.Format("{0}-{1}=?", first, second);
                     result = first - second;
                     break;
                 default:
@@ -495,7 +495,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _storageProvider; }
             set
             {
-                CaptchaUtils.IsNotNull(value, "The property StorageProvider cannot be null.");
+                Validate.PropertyNotNull(value, "StorageProvider");
                 _storageProvider = value;
             }
         }
@@ -514,16 +514,37 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public virtual IBuildInfoModel GenerateNew(HtmlHelper htmlHelper, IParameterContainer parameterContainer)
         {
-            if (htmlHelper == null)
-                throw new ArgumentNullException("htmlHelper");
-            if (parameterContainer == null)
-                throw new ArgumentNullException("parameterContainer");
+            Validate.ArgumentNotNull(htmlHelper, "htmlHelper");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
             KeyValuePair<string, ICaptchaValue> captchaPair = CreateCaptchaPair(parameterContainer, null);
             StorageProvider.Add(captchaPair);
             var urlHelper = new UrlHelper(htmlHelper.ViewContext.RequestContext);
             string imgUrl = ImageUrlFactory(urlHelper, captchaPair);
             string refreshUrl = RefreshUrlFactory(urlHelper, captchaPair);
             return CreateBuildInfo(htmlHelper, parameterContainer, captchaPair, imgUrl, refreshUrl);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="IUpdateInfoModel" /> for create a new captcha.
+        /// </summary>
+        /// <param name="controller">
+        ///     The specified <see cref="ControllerBase" />.
+        /// </param>
+        /// <param name="parameterContainer">
+        ///     The specified <see cref="IParameterContainer" />.
+        /// </param>
+        /// <returns>
+        ///     An instance of <see cref="IUpdateInfoModel" />.
+        /// </returns>
+        public virtual IUpdateInfoModel GenerateNew(ControllerBase controller, IParameterContainer parameterContainer)
+        {
+            Validate.ArgumentNotNull(controller, "controller");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
+            KeyValuePair<string, ICaptchaValue> captchaPair = CreateCaptchaPair(parameterContainer, null);
+            StorageProvider.Add(captchaPair);
+            var urlHelper = new UrlHelper(controller.ControllerContext.RequestContext);
+            string imgUrl = ImageUrlFactory(urlHelper, captchaPair);
+            return new DefaultUpdateInfoModel(TokenElementName, captchaPair.Key, imgUrl, ImageElementName);
         }
 
         /// <summary>
@@ -537,8 +558,7 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public virtual IDrawingModel GetDrawingModel(IParameterContainer parameterContainer)
         {
-            if (parameterContainer == null)
-                throw new ArgumentNullException("parameterContainer");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
             string token;
             if (!parameterContainer.TryGet(TokenParameterName, out token) || string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
@@ -559,8 +579,7 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public IUpdateInfoModel Update(IParameterContainer parameterContainer)
         {
-            if (parameterContainer == null)
-                throw new ArgumentNullException("parameterContainer");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
             string token;
             parameterContainer.TryGet(TokenParameterName, out token, null);
             if (string.IsNullOrEmpty(token))
@@ -594,10 +613,8 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public virtual bool ValidateCaptcha(ControllerBase controller, IParameterContainer parameterContainer)
         {
-            if (controller == null)
-                throw new ArgumentNullException("controller");
-            if (parameterContainer == null)
-                throw new ArgumentNullException("parameterContainer");
+            Validate.ArgumentNotNull(controller, "controller");
+            Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
             ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
             ValueProviderResult inputText = controller.ValueProvider.GetValue(InputElementName);
             if (tokenValue == null)

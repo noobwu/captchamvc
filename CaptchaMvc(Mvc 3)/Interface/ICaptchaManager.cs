@@ -27,6 +27,20 @@ namespace CaptchaMvc.Interface
         IBuildInfoModel GenerateNew(HtmlHelper htmlHelper, IParameterContainer parameterContainer);
 
         /// <summary>
+        ///     Creates a <see cref="IUpdateInfoModel" /> for create a new captcha.
+        /// </summary>
+        /// <param name="controller">
+        ///     The specified <see cref="ControllerBase" />.
+        /// </param>
+        /// <param name="parameterContainer">
+        ///     The specified <see cref="IParameterContainer" />.
+        /// </param>
+        /// <returns>
+        ///     An instance of <see cref="IUpdateInfoModel" />.
+        /// </returns>
+        IUpdateInfoModel GenerateNew(ControllerBase controller, IParameterContainer parameterContainer);
+
+        /// <summary>
         ///     Creates a new <see cref="IDrawingModel" /> for drawing a captcha.
         /// </summary>
         /// <param name="parameterContainer">

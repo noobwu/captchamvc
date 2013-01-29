@@ -25,8 +25,8 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         public CombinedParameterContainer(IParameterContainer firstContainer, IParameterContainer secondContainer)
         {
-            if (firstContainer == null) throw new ArgumentNullException("firstContainer");
-            if (secondContainer == null) throw new ArgumentNullException("secondContainer");
+            Validate.ArgumentNotNull(firstContainer, "firstContainer");
+            Validate.ArgumentNotNull(secondContainer, "secondContainer");
             _firstContainer = firstContainer;
             _secondContainer = secondContainer;
             ParameterProvider = new object[] {_firstContainer, _secondContainer};

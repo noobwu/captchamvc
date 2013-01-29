@@ -45,7 +45,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _captchaBuilderFactory; }
             set
             {
-                CaptchaUtils.IsNotNullProperty(value, "CaptchaBuilderFactory");
+                Validate.PropertyNotNull(value, "CaptchaBuilderFactory");
                 _captchaBuilderFactory = value;
             }
         }
@@ -63,7 +63,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>The html string with the captcha.</returns>
         public virtual ICaptcha GenerateCaptcha(IBuildInfoModel buildInfoModel)
         {
-            if (buildInfoModel == null) throw new ArgumentNullException("buildInfoModel");
+            Validate.ArgumentNotNull(buildInfoModel, "buildInfoModel");
             return CaptchaBuilderFactory(buildInfoModel).Build(buildInfoModel);
         }
 
@@ -78,8 +78,8 @@ namespace CaptchaMvc.Infrastructure
         /// </param>
         public virtual void WriteCaptchaImage(HttpResponseBase response, IDrawingModel drawingModel)
         {
-            if (response == null) throw new ArgumentNullException("response");
-            if (drawingModel == null) throw new ArgumentNullException("drawingModel");
+            Validate.ArgumentNotNull(response, "response");
+            Validate.ArgumentNotNull(drawingModel, "drawingModel");
             using (Bitmap bitmap = CaptchaUtils.ImageGeneratorFactory(drawingModel).Generate(drawingModel))
             {
                 response.ContentType = "image/gif";
@@ -95,7 +95,7 @@ namespace CaptchaMvc.Infrastructure
         /// </param>
         public virtual void WriteErrorImage(HttpResponseBase response)
         {
-            if (response == null) throw new ArgumentNullException("response");
+            Validate.ArgumentNotNull(response, "response");
             response.ContentType = "image/gif";
             response.OutputStream.Write(ErrorBytes, 0, ErrorBytes.Length);
         }
@@ -111,8 +111,7 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public virtual ActionResult RefreshCaptcha(IUpdateInfoModel updateInfo)
         {
-            if (updateInfo == null)
-                throw new ArgumentNullException("updateInfo");
+            Validate.ArgumentNotNull(updateInfo, "updateInfo");
             string script = string.Format(@"$('#{0}').attr(""value"", ""{1}"");
 $('#{2}').attr(""src"", ""{3}"");", updateInfo.TokenElementId,
                                           updateInfo.TokenValue,

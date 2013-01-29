@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -17,9 +18,9 @@ namespace CaptchaMvc.Models
         public PartialBuildInfoModel(HtmlHelper htmlHelper, IBuildInfoModel buildInfoModel, string partialViewName, string scriptPartialViewName,
                                      ViewDataDictionary viewData)
         {
-            if (htmlHelper == null) throw new ArgumentNullException("htmlHelper");
-            if (buildInfoModel == null) throw new ArgumentNullException("buildInfoModel");
-            if (partialViewName == null) throw new ArgumentNullException("partialViewName");
+            Validate.ArgumentNotNull(htmlHelper, "htmlHelper");
+            Validate.ArgumentNotNull(buildInfoModel, "buildInfoModel");
+            Validate.ArgumentNotNullOrEmpty(partialViewName, "partialViewName");
             HtmlHelper = htmlHelper;
             BuildInfoModel = buildInfoModel;
             PartialViewName = partialViewName;

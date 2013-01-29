@@ -29,7 +29,7 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         public RequestParameterContainer(HttpRequestBase requestBase)
         {
-            if (requestBase == null) throw new ArgumentNullException("requestBase");
+            Validate.ArgumentNotNull(requestBase, "requestBase");
             _requestBase = requestBase;
         }
 

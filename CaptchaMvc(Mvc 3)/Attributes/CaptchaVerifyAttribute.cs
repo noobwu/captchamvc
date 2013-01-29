@@ -16,9 +16,10 @@ namespace CaptchaMvc.Attributes
         /// <summary>
         ///     Initializes a new instance of the <see cref="CaptchaVerifyAttribute" /> class.
         /// </summary>
-        public CaptchaVerifyAttribute(string textError)
+        public CaptchaVerifyAttribute(string errorMessage)
         {
-            TextError = textError;
+            Validate.ArgumentNotNullOrEmpty(errorMessage, "errorMessage");
+            ErrorMessage = errorMessage;
         }
 
         /// <summary>
@@ -26,10 +27,8 @@ namespace CaptchaMvc.Attributes
         /// </summary>
         public CaptchaVerifyAttribute(string resourceName, Type resourceType)
         {
-            if (resourceName == null)
-                throw new ArgumentNullException("resourceName");
-            if (resourceType == null)
-                throw new ArgumentNullException("resourceType");
+            Validate.ArgumentNotNull(resourceName, "resourceName");
+            Validate.ArgumentNotNull(resourceType, "resourceType");
             ResourceAccessor = FindResourceAccessor(resourceName, resourceType);
         }
 
@@ -40,7 +39,7 @@ namespace CaptchaMvc.Attributes
         /// <summary>
         ///     Gets or sets an error message to associate with a validation control if validation fails.
         /// </summary>
-        public string TextError { get; set; }
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         ///     Gets or sets a <see cref="MethodInfo" /> for access to the resource message.
@@ -96,8 +95,8 @@ namespace CaptchaMvc.Attributes
         /// <returns>The error message.</returns>
         protected virtual string GetErrorMessage()
         {
-            if (!string.IsNullOrEmpty(TextError))
-                return TextError;
+            if (!string.IsNullOrEmpty(ErrorMessage))
+                return ErrorMessage;
             return (string) ResourceAccessor.Invoke(null, null);
         }
 

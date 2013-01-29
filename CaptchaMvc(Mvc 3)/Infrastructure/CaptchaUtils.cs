@@ -65,7 +65,7 @@ namespace CaptchaMvc.Infrastructure
             {
                 lock (Locker)
                 {
-                    IsNotNull(value, "The BuilderProvider cannot be null.");
+                    Validate.PropertyNotNull(value, "BuilderProvider");
                     _defaultBuilderProvider = value;
                 }
             }
@@ -96,7 +96,7 @@ namespace CaptchaMvc.Infrastructure
             {
                 lock (Locker)
                 {
-                    IsNotNull(value, "The CaptchaManager can not be null.");
+                    Validate.PropertyNotNull(value, "CaptchaManager");
                     _defaultCaptchaManager = value;
                 }
             }
@@ -125,7 +125,7 @@ namespace CaptchaMvc.Infrastructure
             {
                 lock (Locker)
                 {
-                    IsNotNull(value, "The ImageGenerator can not be null.");
+                    Validate.PropertyNotNull(value, "ImageGenerator");
                     _defaultGenerateImage = value;
                 }
             }
@@ -139,7 +139,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _builderProviderFactory; }
             set
             {
-                IsNotNull(value, "The property BuilderProviderFactory cannot be a null.");
+                Validate.PropertyNotNull(value, "BuilderProviderFactory");
                 _builderProviderFactory = value;
             }
         }
@@ -152,7 +152,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _captchaManagerFactory; }
             set
             {
-                IsNotNull(value, "The property CaptchaManagerFactory cannot be a null.");
+                Validate.PropertyNotNull(value, "CaptchaManagerFactory");
                 _captchaManagerFactory = value;
             }
         }
@@ -165,7 +165,7 @@ namespace CaptchaMvc.Infrastructure
             get { return _imageGeneratorFactory; }
             set
             {
-                IsNotNullProperty(value, "ImageGeneratorFactory");
+                Validate.PropertyNotNull(value, "ImageGeneratorFactory");
                 _imageGeneratorFactory = value;
             }
         }
@@ -292,24 +292,6 @@ namespace CaptchaMvc.Infrastructure
         internal static bool IsContain(this IEnumerable<ParameterModel> parameters, string name)
         {
             return parameters.Any(model => model.Name.Equals(name));
-        }
-
-        internal static void IsNotNullProperty(object propertyValue, string propertyName)
-        {
-            if (propertyValue == null)
-                throw new ArgumentNullException("value",string.Format("The property {0} cannot be a null", propertyName));
-        }
-
-        internal static void IsNotNull(object obj, string message)
-        {
-            if (obj == null)
-                throw new ArgumentException(message);
-        }
-
-        internal static void IsNotNull(string obj, string message)
-        {
-            if (string.IsNullOrEmpty(obj))
-                throw new ArgumentException(message);
         }
 
         #endregion

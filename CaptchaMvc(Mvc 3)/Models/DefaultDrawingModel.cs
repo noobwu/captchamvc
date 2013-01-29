@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Models
@@ -24,8 +25,8 @@ namespace CaptchaMvc.Models
         /// </summary>
         public DefaultDrawingModel(string text, IDictionary<string, object> attributes)
         {
-            if (text == null) throw new ArgumentNullException("text");
-            if (attributes == null) throw new ArgumentNullException("attributes");
+            Validate.ArgumentNotNullOrEmpty(text, "text");
+            Validate.ArgumentNotNull(attributes, "attributes");
             Text = text;
             Attributes = attributes;
         }

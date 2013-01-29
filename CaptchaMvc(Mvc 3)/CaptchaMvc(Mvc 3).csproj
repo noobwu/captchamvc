@@ -65,6 +65,7 @@
     <Compile Include="Infrastructure\RandomText.cs" />
     <Compile Include="Infrastructure\RequestParameterContainer.cs" />
     <Compile Include="Infrastructure\SessionStorageProvider.cs" />
+    <Compile Include="Infrastructure\Validate.cs" />
     <Compile Include="Interface\IBuildInfoModel.cs" />
     <Compile Include="Interface\ICaptcha.cs" />
     <Compile Include="Interface\ICaptchaBuilderProvider.cs" />
