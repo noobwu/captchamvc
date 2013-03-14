@@ -23,13 +23,15 @@ namespace CaptchaMvc.Models
         /// <summary>
         ///     Initializes a new instance of the <see cref="CaptchaModel" /> class.
         /// </summary>
-        public CaptchaModel(string markup, string script)
+        public CaptchaModel(IBuildInfoModel buildInfoModel, string markup, string script)
         {
+            Validate.ArgumentNotNull(buildInfoModel, "buildInfoModel");
             Validate.ArgumentNotNull(markup, "markup");
             _markup = markup;
             if (script == null)
                 script = string.Empty;
             _script = script;
+            BuildInfo = buildInfoModel;
         }
 
         #endregion
@@ -52,6 +54,11 @@ namespace CaptchaMvc.Models
         #endregion
 
         #region Implementation of ICaptcha
+
+        /// <summary>
+        ///     Gets the <see cref="IBuildInfoModel"/>.
+        /// </summary>
+        public IBuildInfoModel BuildInfo { get; private set; }
 
         /// <summary>
         ///     Renders only captcha markup, if any.

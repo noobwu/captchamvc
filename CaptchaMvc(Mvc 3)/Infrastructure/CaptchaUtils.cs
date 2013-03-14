@@ -16,12 +16,12 @@ namespace CaptchaMvc.Infrastructure
         #region Fields
 
         private static readonly object Locker = new object();
-        private static volatile IGenerateImage _defaultGenerateImage;
+        private static volatile IImageGenerator _defaultImageGenerator;
         private static volatile ICaptchaBuilderProvider _defaultBuilderProvider;
         private static volatile ICaptchaManager _defaultCaptchaManager;
         private static Func<IParameterContainer, ICaptchaBuilderProvider> _builderProviderFactory;
         private static Func<IParameterContainer, ICaptchaManager> _captchaManagerFactory;
-        private static Func<IDrawingModel, IGenerateImage> _imageGeneratorFactory;
+        private static Func<IDrawingModel, IImageGenerator> _imageGeneratorFactory;
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace CaptchaMvc.Infrastructure
         {
             BuilderProviderFactory = container => BuilderProvider;
             CaptchaManagerFactory = container => CaptchaManager;
-            ImageGeneratorFactory = model => ImageGenerator;
+            ImageGeneratorFactory = model => ImageGeneratorGenerator;
         }
 
         #endregion
@@ -103,30 +103,30 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets or sets the current <see cref="IGenerateImage"/>.
+        /// Gets or sets the current <see cref="IImageGenerator"/>.
         /// </summary>
-        public static IGenerateImage ImageGenerator
+        public static IImageGenerator ImageGeneratorGenerator
         {
             get
             {
-                if (_defaultGenerateImage == null)
+                if (_defaultImageGenerator == null)
                 {
                     lock (Locker)
                     {
-                        if (_defaultGenerateImage == null)
+                        if (_defaultImageGenerator == null)
                         {
-                            _defaultGenerateImage = GetService<IGenerateImage>("CaptchaIGenerate", () => new DefaultGenerateImage());
+                            _defaultImageGenerator = GetService<IImageGenerator>("CaptchaIGenerate", () => new DefaultImageGenerator());
                         }
                     }
                 }
-                return _defaultGenerateImage;
+                return _defaultImageGenerator;
             }
             set
             {
                 lock (Locker)
                 {
-                    Validate.PropertyNotNull(value, "ImageGenerator");
-                    _defaultGenerateImage = value;
+                    Validate.PropertyNotNull(value, "ImageGeneratorGenerator");
+                    _defaultImageGenerator = value;
                 }
             }
         }
@@ -158,9 +158,9 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets or sets the factory to create <see cref="IGenerateImage"/>.
+        /// Gets or sets the factory to create <see cref="IImageGenerator"/>.
         /// </summary>
-        public static Func<IDrawingModel, IGenerateImage> ImageGeneratorFactory
+        public static Func<IDrawingModel, IImageGenerator> ImageGeneratorFactory
         {
             get { return _imageGeneratorFactory; }
             set

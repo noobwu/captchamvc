@@ -10,9 +10,9 @@ using NUnit.Framework;
 
 namespace CaptchaMvc.Test.Infrastructure
 {
-    public class FakeImageGenerator : IGenerateImage
+    public class FakeImageGeneratorGenerator : IImageGenerator
     {
-        #region Implementation of IGenerateImage
+        #region Implementation of IImageGenerator
 
         /// <summary>
         ///  Create a captcha image.
@@ -125,8 +125,8 @@ namespace CaptchaMvc.Test.Infrastructure
         [Test]
         public void TestLoadFromConfig()
         {
-            Assert.IsNotNull(CaptchaUtils.ImageGenerator);
-            Assert.IsInstanceOf(typeof (FakeImageGenerator), CaptchaUtils.ImageGenerator);
+            Assert.IsNotNull(CaptchaUtils.ImageGeneratorGenerator);
+            Assert.IsInstanceOf(typeof (FakeImageGeneratorGenerator), CaptchaUtils.ImageGeneratorGenerator);
         }
 
         [Test]

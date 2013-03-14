@@ -8,6 +8,11 @@ namespace CaptchaMvc.Interface
     public interface ICaptcha : IHtmlString
     {
         /// <summary>
+        ///     Gets the <see cref="IBuildInfoModel"/>.
+        /// </summary>
+        IBuildInfoModel BuildInfo { get; }
+
+        /// <summary>
         ///     Renders only captcha markup, if any.
         /// </summary>
         /// <returns>

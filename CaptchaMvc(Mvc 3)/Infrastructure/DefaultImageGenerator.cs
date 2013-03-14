@@ -10,7 +10,7 @@ namespace CaptchaMvc.Infrastructure
     /// <summary>
     ///     Represents default implementation to generate captcha image.
     /// </summary>
-    public class DefaultGenerateImage : IGenerateImage
+    public class DefaultImageGenerator : IImageGenerator
     {
         #region Fields
 
@@ -23,7 +23,7 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
-        public DefaultGenerateImage()
+        public DefaultImageGenerator()
         {
             Width = 200;
             Height = 70;
@@ -40,7 +40,7 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Implementation of IGenerateImage
+        #region Implementation of IImageGenerator
 
         /// <summary>
         ///     Gets or sets the font color.

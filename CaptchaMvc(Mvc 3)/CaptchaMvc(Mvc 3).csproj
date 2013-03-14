@@ -57,7 +57,7 @@
     <Compile Include="Infrastructure\DefaultCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\DefaultCaptchaBuilderProvider.cs" />
     <Compile Include="Infrastructure\DefaultCaptchaManager.cs" />
-    <Compile Include="Infrastructure\DefaultGenerateImage.cs" />
+    <Compile Include="Infrastructure\DefaultImageGenerator.cs" />
     <Compile Include="Infrastructure\MathCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\ParameterModelContainer.cs" />
     <Compile Include="Infrastructure\PartialCaptchaBuilder.cs" />
@@ -73,7 +73,7 @@
     <Compile Include="Interface\ICaptchaManager.cs" />
     <Compile Include="Interface\ICaptchaValue.cs" />
     <Compile Include="Interface\IDrawingModel.cs" />
-    <Compile Include="Interface\IGenerateImage.cs" />
+    <Compile Include="Interface\IImageGenerator.cs" />
     <Compile Include="Interface\IParameterContainer.cs" />
     <Compile Include="Interface\IStorageProvider.cs" />
     <Compile Include="Interface\IUpdateInfoModel.cs" />

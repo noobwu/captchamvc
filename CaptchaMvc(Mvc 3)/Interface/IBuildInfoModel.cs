@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace CaptchaMvc.Interface
 {
@@ -7,6 +8,11 @@ namespace CaptchaMvc.Interface
     /// </summary>
     public interface IBuildInfoModel
     {
+        /// <summary>
+        ///     Gets the attributes.
+        /// </summary>
+        IDictionary<string, string> Attributes { get; }
+
         /// <summary>
         ///     Gets the parameter container.
         /// </summary>

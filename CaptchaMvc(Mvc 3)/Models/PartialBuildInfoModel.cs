@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
@@ -53,11 +54,19 @@ namespace CaptchaMvc.Models
         public ViewDataDictionary ViewData { get; set; }
 
         /// <summary>
+        ///     Gets the attributes.
+        /// </summary>
+        public IDictionary<string, string> Attributes
+        {
+            get { return BuildInfoModel.Attributes; }
+        }
+
+        /// <summary>
         ///     Gets the parameter container.
         /// </summary>
         public IParameterContainer ParameterContainer
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.ParameterContainer; }
         }
 
         /// <summary>
@@ -65,7 +74,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string TokenParameterName
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.TokenParameterName; }
         }
 
         /// <summary>
@@ -73,7 +82,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string RequiredMessage
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.RequiredMessage; }
         }
 
         /// <summary>
@@ -81,7 +90,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public bool IsRequired
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.IsRequired; }
         }
 
         /// <summary>
@@ -89,7 +98,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string RefreshButtonText
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.RefreshButtonText; }
         }
 
         /// <summary>
@@ -97,7 +106,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string InputText
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.InputText; }
         }
 
         /// <summary>
@@ -110,7 +119,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string InputElementId
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.InputElementId; }
         }
 
         /// <summary>
@@ -118,7 +127,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string TokenElementId
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.TokenElementId; }
         }
 
         /// <summary>
@@ -126,7 +135,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string ImageElementId
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.ImageElementId; }
         }
 
         /// <summary>
@@ -134,7 +143,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string ImageUrl
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.ImageUrl; }
         }
 
         /// <summary>
@@ -142,7 +151,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string RefreshUrl
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.RefreshUrl; }
         }
 
         /// <summary>
@@ -150,7 +159,7 @@ namespace CaptchaMvc.Models
         /// </summary>
         public string TokenValue
         {
-            get { throw new NotSupportedException(); }
+            get { return BuildInfoModel.TokenValue; }
         }
 
         #endregion

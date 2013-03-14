@@ -137,9 +137,9 @@ namespace CaptchaMvc.HtmlHelpers
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.LengthAttribute, length));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
+            list.Add(new ParameterModel(DefaultCaptchaManager.ScriptPartialViewNameAttribute, scriptPartialViewName));
             if (viewData != null)
                 list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewDataAttribute, viewData));
-            list.Add(new ParameterModel(DefaultCaptchaManager.ScriptPartialViewNameAttribute, scriptPartialViewName));
             return CaptchaUtils.GenerateCaptcha(htmlHelper, list);
         }
 
@@ -259,8 +259,9 @@ namespace CaptchaMvc.HtmlHelpers
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
             list.Add(new ParameterModel(DefaultCaptchaManager.MathCaptchaAttribute, true));
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
+            list.Add(new ParameterModel(DefaultCaptchaManager.ScriptPartialViewNameAttribute, scriptPartialViewName));
             if (viewData != null)
-                list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewDataAttribute, viewData));
+                list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewDataAttribute, viewData));            
             return CaptchaUtils.GenerateCaptcha(htmlHelper, list);
         }
 
@@ -271,15 +272,13 @@ namespace CaptchaMvc.HtmlHelpers
         ///     The specified <see cref="ControllerBase" />.
         /// </param>
         /// <param name="errorText">The specified error message.</param>
-        /// <param name="parameters">The specified parameters, if any.</param>
         /// <returns>
         ///     <c>True</c> if the captcha is valid; otherwise, <c>false</c>.
         /// </returns>
-        [Obsolete("Use the IsValidCaptcha method.")]
-        public static bool IsCaptchaVerify(this ControllerBase controllerBase, string errorText,
-                                           params ParameterModel[] parameters)
+        [Obsolete("Use the IsCaptchaValid method.")]
+        public static bool IsCaptchaVerify(this ControllerBase controllerBase, string errorText)
         {
-            return IsValidCaptcha(controllerBase, errorText, parameters);
+            return IsCaptchaValid(controllerBase, errorText);
         }
 
         /// <summary>
@@ -293,7 +292,7 @@ namespace CaptchaMvc.HtmlHelpers
         /// <returns>
         ///     <c>True</c> if the captcha is valid; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsValidCaptcha(this ControllerBase controllerBase, string errorText,
+        public static bool IsCaptchaValid(this ControllerBase controllerBase, string errorText,
                                           params ParameterModel[] parameters)
         {
             List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);

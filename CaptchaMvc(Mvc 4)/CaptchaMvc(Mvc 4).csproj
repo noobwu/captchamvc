@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\Release\Mvc 4\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;MVC4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\Release\Mvc 4\CaptchaMvc.XML</DocumentationFile>
@@ -77,8 +77,8 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultCaptchaManager.cs">
       <Link>Infrastructure\DefaultCaptchaManager.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultGenerateImage.cs">
-      <Link>Infrastructure\DefaultGenerateImage.cs</Link>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultImageGenerator.cs">
+      <Link>Infrastructure\DefaultImageGenerator.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MathCaptchaBuilder.cs">
       <Link>Infrastructure\MathCaptchaBuilder.cs</Link>
@@ -125,8 +125,8 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IDrawingModel.cs">
       <Link>Interface\IDrawingModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IGenerateImage.cs">
-      <Link>Interface\IGenerateImage.cs</Link>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IImageGenerator.cs">
+      <Link>Interface\IImageGenerator.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IParameterContainer.cs">
       <Link>Interface\IParameterContainer.cs</Link>

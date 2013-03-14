@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using CaptchaMvc.Infrastructure;
 using CaptchaMvc.Interface;
@@ -41,11 +41,17 @@ namespace CaptchaMvc.Models
             RefreshUrl = refreshUrl;
             ImageUrl = imageUrl;
             TokenValue = tokenValue;
+            Attributes = new Dictionary<string, string>();
         }
 
         #endregion
 
         #region Implementation of IBuildInfoModel
+
+        /// <summary>
+        ///     Gets the attributes.
+        /// </summary>
+        public IDictionary<string, string> Attributes { get; private set; }
 
         /// <summary>
         ///     Gets the parameter container.

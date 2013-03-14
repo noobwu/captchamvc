@@ -6,7 +6,7 @@ namespace CaptchaMvc.Interface
     /// <summary>
     ///     Represents interface to generate captcha image.
     /// </summary>
-    public interface IGenerateImage
+    public interface IImageGenerator
     {
         /// <summary>
         ///     Gets or sets the font color.

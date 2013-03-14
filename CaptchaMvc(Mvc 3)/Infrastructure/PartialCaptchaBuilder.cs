@@ -43,8 +43,8 @@ namespace CaptchaMvc.Infrastructure
                     script = infoModel.HtmlHelper.Partial(infoModel.ScriptPartialViewName, infoModel.BuildInfoModel);
             }
             if (script == null)
-                return new CaptchaModel(markup.ToHtmlString(), null);
-            return new CaptchaModel(markup.ToHtmlString(), script.ToHtmlString());
+                return new CaptchaModel(buildInfoModel, markup.ToHtmlString(), null);
+            return new CaptchaModel(buildInfoModel, markup.ToHtmlString(), script.ToHtmlString());
         }
 
         #endregion

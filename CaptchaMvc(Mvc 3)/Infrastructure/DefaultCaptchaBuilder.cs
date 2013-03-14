@@ -82,7 +82,7 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
             string markup = string.Format("{0}{1} <br/>{2}<br/>{3}<br/>{4}", captchaFormat,
                                           generateTokenElement, refreshButton.Markup,
                                           buildInfoModel.InputText, inputElement);
-            return new CaptchaModel(markup, refreshButton.Script);
+            return new CaptchaModel(buildInfoModel, markup, refreshButton.Script);
         }
 
         #endregion
@@ -156,7 +156,7 @@ function {4} {{ $('#{0}').hide(); $.post(""{1}"", {{ {2}: $('#{3}').val() }}, fu
             string functionName = string.Format("______{0}________()", Guid.NewGuid().ToString("N"));
             var tagA = new TagBuilder("a");
             tagA.Attributes.Add("onclick", functionName);
-            tagA.Attributes.Add("href", "#" + buildInfoModel.InputElementId);
+            tagA.Attributes.Add("href", "#" + buildInfoModel.ImageElementId);
             tagA.Attributes.Add("style", "display:none;");
             tagA.SetInnerText(buildInfoModel.RefreshButtonText);
             tagA.Attributes.Add("id", id);
