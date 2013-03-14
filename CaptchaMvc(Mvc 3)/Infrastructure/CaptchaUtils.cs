@@ -34,7 +34,7 @@ namespace CaptchaMvc.Infrastructure
         {
             BuilderProviderFactory = container => BuilderProvider;
             CaptchaManagerFactory = container => CaptchaManager;
-            ImageGeneratorFactory = model => ImageGeneratorGenerator;
+            ImageGeneratorFactory = model => ImageGenerator;
         }
 
         #endregion
@@ -105,7 +105,7 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         /// Gets or sets the current <see cref="IImageGenerator"/>.
         /// </summary>
-        public static IImageGenerator ImageGeneratorGenerator
+        public static IImageGenerator ImageGenerator
         {
             get
             {
