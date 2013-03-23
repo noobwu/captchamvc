@@ -10,7 +10,7 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    ///     Provides a basic methods for create captcha.
+    ///     Provides a basic methods to create a captcha.
     /// </summary>
     public class DefaultCaptchaBuilderProvider : ICaptchaBuilderProvider
     {

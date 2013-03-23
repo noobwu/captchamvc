@@ -53,6 +53,7 @@ namespace CaptchaMvc.Infrastructure
             Validate.ArgumentNotNullOrEmpty(imageElementName, "imageElementName");
             Validate.ArgumentNotNullOrEmpty(tokenElementName, "tokenElementName");
 
+            IntelligencePolicy = new FakeInputIntelligencePolicy(this);
             StorageProvider = storageProvider;
             TokenParameterName = tokenParameterName;
             InputElementName = inputElementName;
@@ -127,6 +128,11 @@ namespace CaptchaMvc.Infrastructure
         ///     Gets the parameter-key for script partial view name.
         /// </summary>
         public const string ScriptPartialViewNameAttribute = "____ScriptPartialViewNameAttribute____";
+
+        /// <summary>
+        /// Gets the parameter-key for view data.
+        /// </summary>
+        public const string CaptchaNotValidViewDataKey = "IntelligentCaptchaNotValidaViewDataKey";
 
         #endregion
 
@@ -292,12 +298,12 @@ namespace CaptchaMvc.Infrastructure
             string inputText;
             parameterContainer.TryGet(RefreshTextAttribute, out refreshText, "Refresh");
             bool findInputText = parameterContainer.TryGet(InputTextAttribute, out inputText);
-            bool isRequired = parameterContainer.IsContain(IsRequiredAttribute);
+            bool isRequired = parameterContainer.IsContains(IsRequiredAttribute);
             if (isRequired)
                 parameterContainer.TryGet(RequiredMessageAttribute, out requiredText, "This is a required field.");
 
             IBuildInfoModel buildInfo;
-            if (parameterContainer.IsContain(MathCaptchaAttribute))
+            if (parameterContainer.IsContains(MathCaptchaAttribute))
                 buildInfo = new MathBuildInfoModel(parameterContainer, TokenParameterName, MathCaptchaAttribute, isRequired, requiredText,
                                                    refreshText, findInputText ? inputText : "The answer is", htmlHelper,
                                                    InputElementName, TokenElementName,
@@ -311,7 +317,7 @@ namespace CaptchaMvc.Infrastructure
                                                       captchaPair.Key);
 
             //If it a partial view.
-            if (parameterContainer.IsContain(PartialViewNameAttribute))
+            if (parameterContainer.IsContains(PartialViewNameAttribute))
             {
                 ViewDataDictionary viewData;
                 parameterContainer.TryGet(PartialViewDataAttribute, out viewData);
@@ -338,7 +344,7 @@ namespace CaptchaMvc.Infrastructure
         protected virtual KeyValuePair<string, ICaptchaValue> CreateCaptchaPair(IParameterContainer parameterContainer,
                                                                                 ICaptchaValue oldValue)
         {
-            if (parameterContainer.IsContain(MathCaptchaAttribute))
+            if (parameterContainer.IsContains(MathCaptchaAttribute))
                 return MathCaptchaPairFactory();
 
             int length;
@@ -481,6 +487,7 @@ namespace CaptchaMvc.Infrastructure
             string errorText;
             parameterContainer.TryGet(ErrorAttribute, out errorText, "The captcha is not valid");
             controllerBase.ViewData.ModelState.AddModelError(InputElementName, errorText);
+            controllerBase.ViewData[CaptchaNotValidViewDataKey] = true;
         }
 
         #endregion
@@ -499,6 +506,11 @@ namespace CaptchaMvc.Infrastructure
                 _storageProvider = value;
             }
         }
+
+        /// <summary>
+        ///     Gets or sets the intelligence policy.
+        /// </summary>
+        public IIntelligencePolicy IntelligencePolicy { get; set; }
 
         /// <summary>
         ///     Creates a <see cref="IBuildInfoModel" /> for create a new captcha.
@@ -562,7 +574,7 @@ namespace CaptchaMvc.Infrastructure
             string token;
             if (!parameterContainer.TryGet(TokenParameterName, out token) || string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
-            ICaptchaValue captchaValue = StorageProvider.GetDrawingValue(token);
+            ICaptchaValue captchaValue = StorageProvider.GetValue(token, TokenType.Drawing);
             if (captchaValue == null)
                 throw new ArgumentException("The key is to generate incorrect.");
             return DrawingModelFactory(parameterContainer, captchaValue);
@@ -584,7 +596,7 @@ namespace CaptchaMvc.Infrastructure
             parameterContainer.TryGet(TokenParameterName, out token, null);
             if (string.IsNullOrEmpty(token))
                 throw new KeyNotFoundException("The key is to generate not found.");
-            ICaptchaValue captchaValue = StorageProvider.GetValidationValue(token);
+            ICaptchaValue captchaValue = StorageProvider.GetValue(token, TokenType.Validation);
             if (captchaValue == null)
                 throw new ArgumentException("The key is to update incorrect.");
 
@@ -615,20 +627,25 @@ namespace CaptchaMvc.Infrastructure
         {
             Validate.ArgumentNotNull(controller, "controller");
             Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
-            ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
-            ValueProviderResult inputText = controller.ValueProvider.GetValue(InputElementName);
-            if (tokenValue == null)
-                throw new ArgumentException("The parameterContainer does not contain a token value.");
-            if (inputText == null)
-                throw new ArgumentException("The parameterContainer does not contain a captcha input value.");
-
-            ICaptchaValue captchaValue = StorageProvider.GetValidationValue(tokenValue.AttemptedValue);
-            if (captchaValue == null || string.IsNullOrEmpty(inputText.AttemptedValue))
+            var isValid = IntelligencePolicy.IsValid(controller, parameterContainer);
+            if (isValid.HasValue)
             {
+                if (isValid.Value)
+                    return true;
                 WriteError(controller, parameterContainer);
                 return false;
             }
-            if (captchaValue.IsEqual(inputText.AttemptedValue))
+
+            ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
+            if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))
+                throw new ArgumentException("The parameterContainer does not contain a token value.");
+            ValueProviderResult inputText = controller.ValueProvider.GetValue(InputElementName);
+            if (inputText == null)
+                throw new ArgumentException("The parameterContainer does not contain a captcha input value.");
+
+            ICaptchaValue captchaValue = StorageProvider.GetValue(tokenValue.AttemptedValue, TokenType.Validation);
+            if (captchaValue != null && !string.IsNullOrEmpty(inputText.AttemptedValue) &&
+                captchaValue.IsEqual(inputText.AttemptedValue))
                 return true;
             WriteError(controller, parameterContainer);
             return false;

@@ -80,6 +80,12 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultImageGenerator.cs">
       <Link>Infrastructure\DefaultImageGenerator.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\FakeInputIntelligencePolicy.cs">
+      <Link>Infrastructure\FakeInputIntelligencePolicy.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\JavaScriptIntelligencePolicy.cs">
+      <Link>Infrastructure\JavaScriptIntelligencePolicy.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MathCaptchaBuilder.cs">
       <Link>Infrastructure\MathCaptchaBuilder.cs</Link>
     </Compile>
@@ -128,6 +134,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IImageGenerator.cs">
       <Link>Interface\IImageGenerator.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IIntelligencePolicy.cs">
+      <Link>Interface\IIntelligencePolicy.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IParameterContainer.cs">
       <Link>Interface\IParameterContainer.cs</Link>
     </Compile>
@@ -154,6 +163,9 @@
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\DefaultUpdateInfoModel.cs">
       <Link>Models\DefaultUpdateInfoModel.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\IntelligentCaptchaDecorator.cs">
+      <Link>Models\IntelligentCaptchaDecorator.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\MathBuildInfoModel.cs">
       <Link>Models\MathBuildInfoModel.cs</Link>

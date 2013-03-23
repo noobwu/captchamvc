@@ -1,5 +1,4 @@
-﻿using System;
-using CaptchaMvc.Interface;
+﻿using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Infrastructure
 {
@@ -48,9 +47,21 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsContain(string key)
+        public bool IsContains(string key)
         {
-            return _firstContainer.IsContain(key) || _secondContainer.IsContain(key);
+            return _firstContainer.IsContains(key) || _secondContainer.IsContains(key);
+        }
+
+        /// <summary>
+        ///     Determines whether the <see cref="IParameterContainer" /> contains a specific key.
+        /// </summary>
+        /// <param name="key">The specified key.</param>
+        /// <returns>
+        ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
+        /// </returns>
+        bool IParameterContainer.IsContain(string key)
+        {
+            return IsContains(key);
         }
 
         /// <summary>
@@ -61,9 +72,9 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>An instance of T.</returns>
         public T Get<T>(string key)
         {
-            if (_firstContainer.IsContain(key))
+            if (_firstContainer.IsContains(key))
                 return _firstContainer.Get<T>(key);
-            if (_secondContainer.IsContain(key))
+            if (_secondContainer.IsContains(key))
                 return _secondContainer.Get<T>(key);
             return default(T);
         }
@@ -79,9 +90,9 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public bool TryGet<T>(string key, out T value)
         {
-            if (_firstContainer.IsContain(key))
+            if (_firstContainer.IsContains(key))
                 return _firstContainer.TryGet(key, out value);
-            if (_secondContainer.IsContain(key))
+            if (_secondContainer.IsContains(key))
                 return _secondContainer.TryGet(key, out value);
             value = default(T);
             return false;
@@ -99,9 +110,9 @@ namespace CaptchaMvc.Infrastructure
         /// </returns>
         public bool TryGet<T>(string key, out T value, T defaultValue)
         {
-            if (_firstContainer.IsContain(key))
+            if (_firstContainer.IsContains(key))
                 return _firstContainer.TryGet(key, out value, defaultValue);
-            if (_secondContainer.IsContain(key))
+            if (_secondContainer.IsContains(key))
                 return _secondContainer.TryGet(key, out value, defaultValue);
             value = defaultValue;
             return false;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using CaptchaMvc.Interface;
@@ -46,15 +45,27 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Determines whether the <see cref="IParameterContainer"/> contains a specific key.
+        ///     Determines whether the <see cref="IParameterContainer" /> contains a specific key.
         /// </summary>
         /// <param name="key">The specified key.</param>
-        /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
-        public bool IsContain(string key)
+        /// <returns>
+        ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsContains(string key)
         {
             if (key == HttpRequestParameterKey)
                 return true;
             return _requestBase.Params.AllKeys.Any(s => s.Equals(key));
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="IParameterContainer"/> contains a specific key.
+        /// </summary>
+        /// <param name="key">The specified key.</param>
+        /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
+        bool IParameterContainer.IsContain(string key)
+        {
+            return IsContains(key);
         }
 
         /// <summary>
@@ -66,8 +77,8 @@ namespace CaptchaMvc.Infrastructure
         public T Get<T>(string key)
         {
             if (key == HttpRequestParameterKey)
-                return (T) ((object) _requestBase);
-            return (T) TypeDescriptor.GetConverter(typeof (T)).ConvertFrom(_requestBase.Params[key]);
+                return (T)((object)_requestBase);
+            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(_requestBase.Params[key]);
         }
 
         /// <summary>
@@ -92,7 +103,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
         public bool TryGet<T>(string key, out T value, T defaultValue)
         {
-            if (!IsContain(key))
+            if (!IsContains(key))
             {
                 value = defaultValue;
                 return false;

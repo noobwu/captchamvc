@@ -90,7 +90,7 @@ namespace CaptchaMvc.Attributes
         }
 
         /// <summary>
-        ///     Returns an error message.
+        ///     Returns a error message.
         /// </summary>
         /// <returns>The error message.</returns>
         protected virtual string GetErrorMessage()

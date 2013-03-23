@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 namespace CaptchaMvc.HtmlHelpers
 {
     /// <summary>
-    ///     Provides extension methods to work with the captcha.
+    ///     Provides extension methods to work with a captcha.
     /// </summary>
     public static class CaptchaHelper
     {
@@ -261,7 +261,7 @@ namespace CaptchaMvc.HtmlHelpers
             list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewNameAttribute, partialViewName));
             list.Add(new ParameterModel(DefaultCaptchaManager.ScriptPartialViewNameAttribute, scriptPartialViewName));
             if (viewData != null)
-                list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewDataAttribute, viewData));            
+                list.Add(new ParameterModel(DefaultCaptchaManager.PartialViewDataAttribute, viewData));
             return CaptchaUtils.GenerateCaptcha(htmlHelper, list);
         }
 
@@ -357,6 +357,26 @@ namespace CaptchaMvc.HtmlHelpers
             list.Add(new ParameterModel(DefaultCaptchaManager.MathCaptchaAttribute, true));
             var container = new CombinedParameterContainer(new ParameterModelContainer(list), new RequestParameterContainer(controller.ControllerContext.HttpContext.Request));
             return controller.GetCaptchaManager().GenerateNew(controller, container);
+        }
+
+        /// <summary>
+        ///     Makes the captcha "intelligent".
+        /// </summary>
+        /// <param name="captcha">
+        ///     The specified <see cref="ICaptcha" />.
+        /// </param>
+        /// <param name="parameters">The specified parameters, if any.</param>
+        /// <returns>
+        ///     An instance of <see cref="ICaptcha" />.
+        /// </returns>
+        public static ICaptcha AsIntelligent(this ICaptcha captcha, params ParameterModel[] parameters)
+        {
+            List<ParameterModel> list = CaptchaUtils.GetParameters(parameters);
+            var container = new CombinedParameterContainer(new ParameterModelContainer(list), captcha.BuildInfo.ParameterContainer);
+            var captchaManager = CaptchaUtils.CaptchaManagerFactory(container);
+            if (captchaManager.IntelligencePolicy == null)
+                throw new NullReferenceException("The IntelligencePolicy property is null.");
+            return captchaManager.IntelligencePolicy.MakeIntelligent(captcha, container);
         }
 
         #endregion

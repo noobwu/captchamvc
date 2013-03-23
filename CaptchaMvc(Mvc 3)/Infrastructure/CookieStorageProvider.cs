@@ -10,7 +10,7 @@ using CaptchaMvc.Interface;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Represents the storage to save a captcha tokens in cookie.
+    ///     Represents the storage to save a captcha tokens in cookie.
     /// </summary>
     public class CookieStorageProvider : IStorageProvider
     {
@@ -26,10 +26,10 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CookieStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="CookieStorageProvider" /> class.
         /// </summary>
         public CookieStorageProvider()
             : this(20)
@@ -37,7 +37,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CookieStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="CookieStorageProvider" /> class.
         /// </summary>
         /// <param name="expiresMinutes">The specified expires of the cookie in minutes.</param>
         public CookieStorageProvider(int expiresMinutes)
@@ -46,7 +46,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CookieStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="CookieStorageProvider" /> class.
         /// </summary>
         /// <param name="cookieName">The specified cookie name.</param>
         public CookieStorageProvider(string cookieName)
@@ -55,7 +55,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CookieStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="CookieStorageProvider" /> class.
         /// </summary>
         /// <param name="expiresMinutes">The specified expires of the cookie in minutes.</param>
         /// <param name="cookieName">The specified cookie name.</param>
@@ -66,7 +66,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CookieStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="CookieStorageProvider" /> class.
         /// </summary>
         /// <param name="expiresMinutes">The specified expires of the cookie in minutes.</param>
         /// <param name="cookieName">The specified cookie name.</param>
@@ -88,9 +88,11 @@ namespace CaptchaMvc.Infrastructure
         #region IStorageProvider Members
 
         /// <summary>
-        /// Adds the specified token and <see cref="ICaptchaValue"/> to the storage.
+        ///     Adds the specified token and <see cref="ICaptchaValue" /> to the storage.
         /// </summary>
-        /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/></param>
+        /// <param name="captchaPair">
+        ///     The specified <see cref="KeyValuePair{TKey,TValue}" />
+        /// </param>
         public virtual void Add(KeyValuePair<string, ICaptchaValue> captchaPair)
         {
             Validate.ArgumentNotNull(captchaPair, "captchaPair");
@@ -117,33 +119,67 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets the <see cref="ICaptchaValue"/> associated with the specified token.
+        ///     Removes the specified token and <see cref="ICaptchaValue" /> to the storage.
         /// </summary>
-        /// <param name="token">The token of the value to get.</param>
-        /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
-        public virtual ICaptchaValue GetDrawingValue(string token)
+        /// <param name="token">The specified token.</param>
+        public bool Remove(string token)
         {
             Validate.ArgumentNotNullOrEmpty(token, "token");
-            return GetFromCookie(CookieName + DrawingKey, token);
+            bool removeDr = RemoveFromCookie(CookieName + DrawingKey, token);
+            bool removeVal = RemoveFromCookie(CookieName, token);
+            return removeDr || removeVal;
         }
 
         /// <summary>
-        /// Gets the <see cref="ICaptchaValue"/> associated with the specified token.
+        ///     Gets an <see cref="ICaptchaValue" /> associated with the specified token.
         /// </summary>
-        /// <param name="token">The token of the value to get.</param>
-        /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
-        public virtual ICaptchaValue GetValidationValue(string token)
+        /// <param name="token">The specified token.</param>
+        /// <param name="tokenType">The specified token type.</param>
+        /// <returns>
+        ///     An instance of <see cref="ICaptchaValue" />.
+        /// </returns>
+        public virtual ICaptchaValue GetValue(string token, TokenType tokenType)
         {
             Validate.ArgumentNotNullOrEmpty(token, "token");
-            return GetFromCookie(CookieName, token);
+            switch (tokenType)
+            {
+                case TokenType.Drawing:
+                    return GetFromCookie(CookieName + DrawingKey, token);
+                case TokenType.Validation:
+                    return GetFromCookie(CookieName, token);
+                default:
+                    throw new ArgumentOutOfRangeException("tokenType");
+            }
+        }
+
+        /// <summary>
+        ///     Determines whether the <see cref="IStorageProvider" /> contains a specific token.
+        /// </summary>
+        /// <param name="token">The specified token.</param>
+        /// <param name="tokenType">The specified token type.</param>
+        /// <returns>
+        ///     <c>True</c> if the value is found in the <see cref="IStorageProvider" />; otherwise <c>false</c>.
+        /// </returns>
+        public virtual bool IsContains(string token, TokenType tokenType)
+        {
+            Validate.ArgumentNotNullOrEmpty(token, "token");
+            switch (tokenType)
+            {
+                case TokenType.Drawing:
+                    return IsContains(CookieName + DrawingKey, token);
+                case TokenType.Validation:
+                    return IsContains(CookieName, token);
+                default:
+                    throw new ArgumentOutOfRangeException("tokenType");
+            }
         }
 
         #endregion
 
-        #region Property
+        #region Properties
 
         /// <summary>
-        /// Gets or sets the cookie name.
+        ///     Gets or sets the cookie name.
         /// </summary>
         public string CookieName
         {
@@ -156,12 +192,12 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Expires of the cookie in minutes.
+        ///     Expires of the cookie in minutes.
         /// </summary>
         public int ExpiresMinutes { get; set; }
 
         /// <summary>
-        /// Gets or sets the password to encrypt cookie.
+        ///     Gets or sets the password to encrypt cookie.
         /// </summary>
         public string Password
         {
@@ -174,7 +210,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets or sets the salt to encrypt cookie.
+        ///     Gets or sets the salt to encrypt cookie.
         /// </summary>
         public byte[] Salt
         {
@@ -188,12 +224,12 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Method
+        #region Methods
 
         private static void ClearCookieIfNeed(HttpCookie httpCookie)
         {
             //Remove the two value from a cookie.
-            if (httpCookie.Value == null) return; 
+            if (httpCookie.Value == null) return;
             if (httpCookie.Value.Length < MaxCookieLength) return;
             httpCookie.Values.Remove(httpCookie.Values.GetKey(0));
             if (httpCookie.Values.Count == 0) return;
@@ -215,10 +251,38 @@ namespace CaptchaMvc.Infrastructure
             return Deserialize(value);
         }
 
+        private static bool IsContains(string cookieName, string token)
+        {
+            HttpCookie httpCookie = HttpContext.Current.Request.Cookies[cookieName];
+            if (httpCookie == null)
+                return false;
+            string value = httpCookie.Values[token];
+            if (string.IsNullOrEmpty(value))
+                return false;
+            return true;
+        }
+
+        private bool RemoveFromCookie(string cookieName, string token)
+        {
+            HttpCookie httpCookie = HttpContext.Current.Request.Cookies[cookieName];
+            if (httpCookie == null)
+                return false;
+            string value = httpCookie.Values[token];
+            if (string.IsNullOrEmpty(value))
+                return false;
+            httpCookie.Values.Remove(token);
+            httpCookie.Expires = DateTime.Now.AddMinutes(ExpiresMinutes);
+            httpCookie.HttpOnly = true;
+            HttpContext.Current.Response.Cookies.Add(httpCookie);
+            return true;
+        }
+
         /// <summary>
-        /// Serializes the <see cref="ICaptchaValue"/>, to the given string.
+        ///     Serializes the <see cref="ICaptchaValue" />, to the given string.
         /// </summary>
-        /// <param name="captchaValue">The specified <see cref="ICaptchaValue"/>.</param>
+        /// <param name="captchaValue">
+        ///     The specified <see cref="ICaptchaValue" />.
+        /// </param>
         /// <returns>The result string.</returns>
         protected virtual string Serialize(ICaptchaValue captchaValue)
         {
@@ -244,10 +308,12 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Deserializes the specified <see cref="string"/> into an <see cref="ICaptchaValue"/>.
+        ///     Deserializes the specified <see cref="string" /> into an <see cref="ICaptchaValue" />.
         /// </summary>
         /// <param name="value">The specified serialize state.</param>
-        /// <returns>The result <see cref="ICaptchaValue"/>.</returns>
+        /// <returns>
+        ///     The result <see cref="ICaptchaValue" />.
+        /// </returns>
         protected virtual ICaptchaValue Deserialize(string value)
         {
             Validate.ArgumentNotNullOrEmpty(value, "value");

@@ -13,6 +13,11 @@ namespace CaptchaMvc.Interface
         IStorageProvider StorageProvider { get; set; }
 
         /// <summary>
+        ///     Gets or sets the intelligence policy.
+        /// </summary>
+        IIntelligencePolicy IntelligencePolicy { get; set; }
+
+        /// <summary>
         ///     Creates a <see cref="IBuildInfoModel" /> for create a new captcha.
         /// </summary>
         /// <param name="htmlHelper">

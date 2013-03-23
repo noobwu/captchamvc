@@ -38,13 +38,25 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
+        ///     Determines whether the <see cref="IParameterContainer" /> contains a specific key.
+        /// </summary>
+        /// <param name="key">The specified key.</param>
+        /// <returns>
+        ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsContains(string key)
+        {
+            return _parameters.IsContains(key);
+        }
+
+        /// <summary>
         /// Determines whether the <see cref="IParameterContainer"/> contains a specific key.
         /// </summary>
         /// <param name="key">The specified key.</param>
         /// <returns><c>True</c> if the value is found in the <see cref="IParameterContainer"/>; otherwise, <c>false</c>.</returns>
-        public bool IsContain(string key)
+        bool IParameterContainer.IsContain(string key)
         {
-            return _parameters.IsContain(key);
+            return IsContains(key);
         }
 
         /// <summary>

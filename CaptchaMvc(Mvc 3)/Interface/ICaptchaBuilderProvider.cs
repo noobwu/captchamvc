@@ -4,7 +4,7 @@ using System.Web.Mvc;
 namespace CaptchaMvc.Interface
 {
     /// <summary>
-    ///     Represents the interface that provides a basic methods for create captcha.
+    ///     Represents the interface that provides a basic methods to create a captcha.
     /// </summary>
     public interface ICaptchaBuilderProvider
     {

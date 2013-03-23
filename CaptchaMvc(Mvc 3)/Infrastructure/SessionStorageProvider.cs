@@ -8,22 +8,21 @@ using CaptchaMvc.Interface;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    /// Represents the storage to save a captcha tokens in session.
+    ///     Represents the storage to save a captcha tokens in session.
     /// </summary>
     public class SessionStorageProvider : IStorageProvider
     {
         #region Fields
 
-        private static readonly object Locker = new object();
         private const string SessionValidateKey = "____________SessionValidateKey_____________";
         private const string SessionDrawingKey = "____________SessionDrawingKey_____________";
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="SessionStorageProvider" /> class.
         /// </summary>
         public SessionStorageProvider()
             : this(10)
@@ -31,7 +30,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionStorageProvider"/> class.
+        ///     Initializes a new instance of the <see cref="SessionStorageProvider" /> class.
         /// </summary>
         /// <param name="maxCount">Gets or sets the maximum values.</param>
         public SessionStorageProvider(int maxCount)
@@ -44,9 +43,11 @@ namespace CaptchaMvc.Infrastructure
         #region IStorageProvider Members
 
         /// <summary>
-        /// Adds the specified token and <see cref="ICaptchaValue"/> to the storage.
+        ///     Adds the specified token and <see cref="ICaptchaValue" /> to the storage.
         /// </summary>
-        /// <param name="captchaPair">The specified <see cref="KeyValuePair{TKey,TValue}"/></param>
+        /// <param name="captchaPair">
+        ///     The specified <see cref="KeyValuePair{TKey,TValue}" />
+        /// </param>
         public virtual void Add(KeyValuePair<string, ICaptchaValue> captchaPair)
         {
             Validate.ArgumentNotNull(captchaPair.Value, "captchaPair");
@@ -57,31 +58,65 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Gets the <see cref="ICaptchaValue"/> associated with the specified token.
+        ///     Removes the specified token and <see cref="ICaptchaValue" /> to the storage.
         /// </summary>
-        /// <param name="token">The token of the value to get.</param>
-        /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
-        public virtual ICaptchaValue GetDrawingValue(string token)
+        /// <param name="token">The specified token.</param>
+        public bool Remove(string token)
+        {
+            Validate.ArgumentNotNullOrEmpty(token, "token");
+            var remove = DrawingKeys.Remove(token);
+            var validation = ValidateKeys.Remove(token);
+            return remove || validation;
+        }
+
+        /// <summary>
+        ///     Gets an <see cref="ICaptchaValue" /> associated with the specified token.
+        /// </summary>
+        /// <param name="token">The specified token.</param>
+        /// <param name="tokenType">The specified token type.</param>
+        /// <returns>
+        ///     An instance of <see cref="ICaptchaValue" />.
+        /// </returns>
+        public virtual ICaptchaValue GetValue(string token, TokenType tokenType)
         {
             Validate.ArgumentNotNullOrEmpty(token, "token");
             ICaptchaValue value;
-            if (DrawingKeys.TryGetValue(token, out value))
-                DrawingKeys.Remove(token);
+            switch (tokenType)
+            {
+                case TokenType.Drawing:
+                    if (DrawingKeys.TryGetValue(token, out value))
+                        DrawingKeys.Remove(token);
+                    break;
+                case TokenType.Validation:
+                    if (ValidateKeys.TryGetValue(token, out value))
+                        ValidateKeys.Remove(token);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("tokenType");
+            }
             return value;
         }
 
         /// <summary>
-        /// Gets the <see cref="ICaptchaValue"/> associated with the specified token.
+        ///     Determines whether the <see cref="IStorageProvider" /> contains a specific token.
         /// </summary>
-        /// <param name="token">The token of the value to get.</param>
-        /// <returns>When this method returns, contains the value associated with the specified token, if the token is found; otherwise, return <c>null</c> value.</returns>
-        public virtual ICaptchaValue GetValidationValue(string token)
+        /// <param name="token">The specified token.</param>
+        /// <param name="tokenType">The specified token type.</param>
+        /// <returns>
+        ///     <c>True</c> if the value is found in the <see cref="IStorageProvider" />; otherwise <c>false</c>.
+        /// </returns>
+        public virtual bool IsContains(string token, TokenType tokenType)
         {
             Validate.ArgumentNotNullOrEmpty(token, "token");
-            ICaptchaValue value;
-            if (ValidateKeys.TryGetValue(token, out value))
-                ValidateKeys.Remove(token);
-            return value;
+            switch (tokenType)
+            {
+                case TokenType.Drawing:
+                    return DrawingKeys.ContainsKey(token);
+                case TokenType.Validation:
+                    return ValidateKeys.ContainsKey(token);
+                default:
+                    throw new ArgumentOutOfRangeException("tokenType");
+            }
         }
 
         #endregion
@@ -89,12 +124,12 @@ namespace CaptchaMvc.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Gets or sets the maximum values.
+        ///     Gets or sets the maximum values.
         /// </summary>
         public int MaxCount { get; set; }
 
         /// <summary>
-        /// Contains tokens that have not yet been validated.
+        ///     Contains tokens that have not yet been validated.
         /// </summary>
         protected IDictionary<string, ICaptchaValue> ValidateKeys
         {
@@ -102,7 +137,7 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
-        /// Contains tokens that have not yet been displayed.
+        ///     Contains tokens that have not yet been displayed.
         /// </summary>
         protected IDictionary<string, ICaptchaValue> DrawingKeys
         {
@@ -111,7 +146,7 @@ namespace CaptchaMvc.Infrastructure
 
         #endregion
 
-        #region Method
+        #region Methods
 
         private void ClearIfNeed(IDictionary<string, ICaptchaValue> dictionary)
         {
@@ -127,14 +162,8 @@ namespace CaptchaMvc.Infrastructure
             var dictionary = HttpContext.Current.Session[key] as IDictionary<string, ICaptchaValue>;
             if (dictionary == null)
             {
-                lock (Locker)
-                {
-                    if (dictionary == null)
-                    {
-                        dictionary = new ConcurrentDictionary<string, ICaptchaValue>();
-                        HttpContext.Current.Session[key] = dictionary;
-                    }
-                }
+                dictionary = new ConcurrentDictionary<string, ICaptchaValue>();
+                HttpContext.Current.Session[key] = dictionary;
             }
             return dictionary;
         }
