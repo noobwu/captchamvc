@@ -95,6 +95,10 @@ namespace CaptchaMvc.Infrastructure
         public ICaptcha MakeIntelligent(ICaptcha captcha, IParameterContainer parameterContainer)
         {
             Validate.ArgumentNotNull(captcha, "captcha");
+            if (captcha.BuildInfo.HtmlHelper.ViewData[DefaultCaptchaManager.CaptchaNotValidViewDataKey] != null)
+                return captcha;
+            if (captcha is IntelligentCaptchaDecorator)
+                return captcha;
             captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
             return new IntelligentCaptchaDecorator(captcha, RenderMarkup, RenderScript);
         }

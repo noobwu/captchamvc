@@ -15,7 +15,7 @@ namespace CaptchaMvc.Infrastructure
         private const string InputHtml =
             @"<input type=""hidden"" value=""{0}"" name=""{1}"" id=""{1}""/>";
         private const string ScriptValue =
-            @"<script>$(function () {{var tok = document.getElementById(""{0}"");var inv = tok.value.split('').reverse().join('');$('<input>').attr({{ type: 'hidden', name: '{1}', value: inv }}).appendTo(tok.form);}});</script>";
+            @"<script>$(function () {{var tok = document.getElementById(""{0}"");var inv = tok.value.split('').reverse().join('');$('<input>').attr({{ type: 'hidden', name: '{1}', id: '{1}', value: inv }}).appendTo(tok.form);}});</script>";
         private readonly DefaultCaptchaManager _captchaManager;
         private string _validationInputName;
 
@@ -95,6 +95,10 @@ namespace CaptchaMvc.Infrastructure
         public ICaptcha MakeIntelligent(ICaptcha captcha, IParameterContainer parameterContainer)
         {
             Validate.ArgumentNotNull(captcha, "captcha");
+            if (captcha.BuildInfo.HtmlHelper.ViewData[DefaultCaptchaManager.CaptchaNotValidViewDataKey] != null)
+                return captcha;
+            if (captcha is IntelligentCaptchaDecorator)
+                return captcha;
             captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
             return new IntelligentCaptchaDecorator(captcha, RenderMarkup, RenderScript);
         }

@@ -469,7 +469,7 @@ namespace CaptchaMvc.Infrastructure
         {
             string chars = ConfigurationManager.AppSettings["CaptchaChars"];
             if (string.IsNullOrEmpty(chars))
-                chars = "qwertyuipasdfghjklzcvbnm123456789";
+                chars = "QWERTYUIPASDFGHJKLZCVBNM";
             return chars;
         }
 
@@ -627,15 +627,17 @@ namespace CaptchaMvc.Infrastructure
         {
             Validate.ArgumentNotNull(controller, "controller");
             Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
-            var isValid = IntelligencePolicy.IsValid(controller, parameterContainer);
-            if (isValid.HasValue)
+            if (IntelligencePolicy != null)
             {
-                if (isValid.Value)
-                    return true;
-                WriteError(controller, parameterContainer);
-                return false;
+                var isValid = IntelligencePolicy.IsValid(controller, parameterContainer);
+                if (isValid.HasValue)
+                {
+                    if (isValid.Value)
+                        return true;
+                    WriteError(controller, parameterContainer);
+                    return false;
+                }    
             }
-
             ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
             if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))
                 throw new ArgumentException("The parameterContainer does not contain a token value.");

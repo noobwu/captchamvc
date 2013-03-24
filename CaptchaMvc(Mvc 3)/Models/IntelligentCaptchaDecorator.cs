@@ -67,8 +67,6 @@ namespace CaptchaMvc.Models
         /// </returns>
         public IHtmlString RenderMarkup()
         {
-            if (_captcha.BuildInfo.HtmlHelper.ViewData[DefaultCaptchaManager.CaptchaNotValidViewDataKey] != null)
-                return _captcha.RenderMarkup();
             return new HtmlString(_renderMarkup(_captcha));
         }
 
@@ -80,8 +78,6 @@ namespace CaptchaMvc.Models
         /// </returns>
         public IHtmlString RenderScript()
         {
-            if (_captcha.BuildInfo.HtmlHelper.ViewData[DefaultCaptchaManager.CaptchaNotValidViewDataKey] != null)
-                return _captcha.RenderScript();
             return new HtmlString(_renderScript(_captcha));
         }
 
