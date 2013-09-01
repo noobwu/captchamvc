@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 using System.Web.Mvc;
 using CaptchaMvc.Interface;
 using CaptchaMvc.Models;
@@ -8,44 +7,37 @@ using CaptchaMvc.Models;
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    ///     Represents the policy which makes a captcha intelligent using the javascript.
+    ///     Represents the policy which makes a captcha as intelligent using the difference between the time of the request and response.
     /// </summary>
-    public class JavaScriptIntelligencePolicy : IIntelligencePolicy
+    public class ResponseTimeIntelligencePolicy : IIntelligencePolicy
     {
         #region Fields
 
-        private const string PolicyType = "js";
-        private const string SessionKey = "jsintelligencevalues";
+        private const string PolicyType = "rt";
+        private const string SessionKey = "rtintelligencevalues";
 
         private const string InputHtml =
             @"<input type=""hidden"" value=""{0}"" name=""{1}"" id=""{1}""/>";
-
-        private const string ScriptValue =
-            @"<script>$(function () {{var tok = document.getElementById(""{0}"");var inv = tok.value.split('').reverse().join('');$('<input>').attr({{ type: 'hidden', name: '{1}', id: '{1}', value: inv }}).appendTo(tok.form);}});</script>";
-
-        private string _validationInputName;
 
         #endregion
 
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="JavaScriptIntelligencePolicy" /> class.
+        ///     Initializes a new instance of the <see cref="FakeInputIntelligencePolicy" /> class.
         /// </summary>
-        public JavaScriptIntelligencePolicy(string validationInputName = null)
-            : this(StorageType.Session, validationInputName)
+        public ResponseTimeIntelligencePolicy(TimeSpan minResponseTime)
+            : this(StorageType.Session, minResponseTime)
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="JavaScriptIntelligencePolicy" /> class.
+        ///     Initializes a new instance of the <see cref="FakeInputIntelligencePolicy" /> class.
         /// </summary>
-        public JavaScriptIntelligencePolicy(StorageType storageType, string validationInputName = null)
+        public ResponseTimeIntelligencePolicy(StorageType storageType, TimeSpan minResponseTime)
         {
-            if (string.IsNullOrEmpty(validationInputName))
-                validationInputName = "validation_token";
-            _validationInputName = validationInputName;
             StorageType = storageType;
+            MinResponseTime = minResponseTime;
             SessionValuesMaxCount = 10;
         }
 
@@ -54,22 +46,14 @@ namespace CaptchaMvc.Infrastructure
         #region Properties
 
         /// <summary>
-        ///     Gets or sets the name of input field, if you use the intelligent captcha.
-        /// </summary>
-        public string ValidationInputName
-        {
-            get { return _validationInputName; }
-            set
-            {
-                Validate.PropertyNotNullOrEmpty(value, "ValidationInputName");
-                _validationInputName = value;
-            }
-        }
-
-        /// <summary>
         ///     Gets the type of storage that will be used for store a data.
         /// </summary>
         public StorageType StorageType { get; private set; }
+
+        /// <summary>
+        ///     Gets the minimum time at which the policy is valid.
+        /// </summary>
+        public TimeSpan MinResponseTime { get; private set; }
 
         /// <summary>
         ///     Gets or sets the maximum size of session values.
@@ -103,12 +87,10 @@ namespace CaptchaMvc.Infrastructure
 
             if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))
                 return null;
-            if (!RemoveTokenValue(controller, tokenValue.AttemptedValue))
+            DateTime? dateTime = GetTokenValue(controller, tokenValue.AttemptedValue);
+            if (dateTime == null)
                 return null;
-
-            ValueProviderResult validationVal = controller.ValueProvider.GetValue(ValidationInputName);
-            return captchaManager.StorageProvider.Remove(tokenValue.AttemptedValue) && validationVal != null
-                && Reverse(validationVal.AttemptedValue) == tokenValue.AttemptedValue;
+            return captchaManager.StorageProvider.Remove(tokenValue.AttemptedValue) && DateTime.UtcNow - dateTime.Value > MinResponseTime;
         }
 
         /// <summary>
@@ -135,7 +117,7 @@ namespace CaptchaMvc.Infrastructure
                 return captcha;
             SaveTokenValue(captcha);
             var tokenName = captchaManager.TokenElementName + PolicyType;
-            return new IntelligentCaptchaDecorator(captcha, c => RenderMarkup(c, tokenName), c => RenderScript(tokenName), PolicyType);
+            return new IntelligentCaptchaDecorator(captcha, c => RenderMarkup(c, tokenName), RenderScript, PolicyType);
         }
 
         #endregion
@@ -159,14 +141,9 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of string.
         /// </returns>
-        private string RenderScript(string tokenElementName)
+        private static string RenderScript(ICaptcha captcha)
         {
-            return string.Format(ScriptValue, tokenElementName, ValidationInputName);
-        }
-
-        private static string Reverse(string st)
-        {
-            return new string(st.Reverse().ToArray());
+            return string.Empty;
         }
 
         private void SaveTokenValue(ICaptcha captcha)
@@ -174,32 +151,43 @@ namespace CaptchaMvc.Infrastructure
             switch (StorageType)
             {
                 case StorageType.TempData:
-                    captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
+                    captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = DateTime.UtcNow;
                     break;
                 case StorageType.Session:
-                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
-                    hashSet.ClearIfNeed(SessionValuesMaxCount);
-                    hashSet.Add(captcha.BuildInfo.TokenValue);
+                    ConcurrentDictionary<string, DateTime> dictionary = CaptchaUtils.GetFromSession(SessionKey,
+                        () => new ConcurrentDictionary<string, DateTime>());
+                    dictionary.ClearIfNeed(SessionValuesMaxCount);
+                    dictionary.TryAdd(captcha.BuildInfo.TokenValue, DateTime.UtcNow);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private bool RemoveTokenValue(ControllerBase controller, string value)
+        private DateTime? GetTokenValue(ControllerBase controller, string value)
         {
             switch (StorageType)
             {
                 case StorageType.TempData:
-                    return controller.TempData.Remove(value);
+                    if (controller.TempData.ContainsKey(value))
+                    {
+                        var result = (DateTime)controller.TempData[value];
+                        controller.TempData.Remove(value);
+                        return result;
+                    }
+                    return null;
                 case StorageType.Session:
-                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
-                    return hashSet.Remove(value);
+                    ConcurrentDictionary<string, DateTime> dictionary = CaptchaUtils.GetFromSession(SessionKey,
+                        () => new ConcurrentDictionary<string, DateTime>());
+                    DateTime time;
+                    if (dictionary.TryRemove(value, out time))
+                        return time;
+                    return null;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        #endregion        
+        #endregion
     }
 }

@@ -17,13 +17,11 @@ namespace CaptchaMvc.Models
         /// <summary>
         ///     Gets the specified captcha text.
         /// </summary>
-        [DataMember]
         public abstract string CaptchaText { get; }
 
         /// <summary>
         ///     Gets the specified captcha value.
         /// </summary>
-        [DataMember]
         public abstract object Value { get; }
 
         /// <summary>

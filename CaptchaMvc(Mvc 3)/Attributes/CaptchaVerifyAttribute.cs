@@ -77,7 +77,7 @@ namespace CaptchaMvc.Attributes
                 throw new InvalidOperationException(
                     string.Format("Resource with the name {0} is not found in the type of {1}.", resourceName,
                                   resourceType));
-            if (propertyInfo.PropertyType != typeof (string))
+            if (propertyInfo.PropertyType != typeof(string))
                 throw new InvalidOperationException(
                     string.Format("Resource with the name {0} in the type of {1}, is not string.", resourceName,
                                   resourceType));
@@ -95,9 +95,10 @@ namespace CaptchaMvc.Attributes
         /// <returns>The error message.</returns>
         protected virtual string GetErrorMessage()
         {
-            if (!string.IsNullOrEmpty(ErrorMessage))
-                return ErrorMessage;
-            return (string) ResourceAccessor.Invoke(null, null);
+            if (ResourceAccessor != null)
+                return (string)ResourceAccessor.Invoke(null, null);
+
+            return ErrorMessage;
         }
 
         #endregion

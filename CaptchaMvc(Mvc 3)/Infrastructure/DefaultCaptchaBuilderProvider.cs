@@ -116,7 +116,7 @@ namespace CaptchaMvc.Infrastructure
 $('#{2}').attr(""src"", ""{3}"");", updateInfo.TokenElementId,
                                           updateInfo.TokenValue,
                                           updateInfo.ImageElementId, updateInfo.ImageUrl);
-            return new JavaScriptResult {Script = script};
+            return new JavaScriptResult { Script = script };
         }
 
         #endregion
@@ -132,8 +132,7 @@ $('#{2}').attr(""src"", ""{3}"");", updateInfo.TokenElementId,
         /// <returns>
         ///     An instance of <see cref="ICaptchaBulder" />.
         /// </returns>
-        [Obsolete("Use the CaptchaBuilderFactory property.")]
-        protected virtual ICaptchaBulder GetCaptchaBuilder(IBuildInfoModel buildInfoModel)
+        private static ICaptchaBulder GetCaptchaBuilder(IBuildInfoModel buildInfoModel)
         {
             if (buildInfoModel is DefaultBuildInfoModel)
                 return new DefaultCaptchaBuilder();

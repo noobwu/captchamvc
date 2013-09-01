@@ -8,6 +8,31 @@ namespace CaptchaMvc.Interface
     public interface ICaptchaManager
     {
         /// <summary>
+        ///     Gets or sets the name for a token parameter.
+        /// </summary>
+        string TokenParameterName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name for an input element in DOM.
+        /// </summary>
+        string InputElementName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name for image element in DOM.
+        /// </summary>
+        string ImageElementName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name for token element in DOM.
+        /// </summary>
+        string TokenElementName { get; set; }
+
+        /// <summary>
+        /// Gets or sets value that indicates that the current manager will add area route value in generated url.
+        /// </summary>
+        bool AddAreaRouteValue { get; set; }
+
+        /// <summary>
         ///     Gets or sets the storage to save a captcha tokens.
         /// </summary>
         IStorageProvider StorageProvider { get; set; }

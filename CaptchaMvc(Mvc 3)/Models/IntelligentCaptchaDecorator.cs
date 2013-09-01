@@ -24,13 +24,26 @@ namespace CaptchaMvc.Models
         ///     Initializes a new instance of the <see cref="IntelligentCaptchaDecorator" /> class.
         /// </summary>
         public IntelligentCaptchaDecorator(ICaptcha captcha, Func<ICaptcha, string> renderMarkup,
-                                           Func<ICaptcha, string> renderScript)
+                                           Func<ICaptcha, string> renderScript, string policyType)
         {
             Validate.ArgumentNotNull(captcha, "captcha");
+            Validate.ArgumentNotNull(renderMarkup, "renderMarkup");
+            Validate.ArgumentNotNull(renderScript, "renderScript");
+            Validate.ArgumentNotNull(policyType, "policyType");
             _captcha = captcha;
             _renderMarkup = renderMarkup;
             _renderScript = renderScript;
+            PolicyType = policyType;
         }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the type of the current decorator.
+        /// </summary>
+        public string PolicyType { get; private set; }
 
         #endregion
 

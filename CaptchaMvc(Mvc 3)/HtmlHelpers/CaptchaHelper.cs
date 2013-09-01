@@ -376,7 +376,7 @@ namespace CaptchaMvc.HtmlHelpers
             var captchaManager = CaptchaUtils.CaptchaManagerFactory(container);
             if (captchaManager.IntelligencePolicy == null)
                 throw new NullReferenceException("The IntelligencePolicy property is null.");
-            return captchaManager.IntelligencePolicy.MakeIntelligent(captcha, container);
+            return captchaManager.IntelligencePolicy.MakeIntelligent(captchaManager, captcha, container);
         }
 
         #endregion

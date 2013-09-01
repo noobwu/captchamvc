@@ -102,36 +102,43 @@ namespace CaptchaMvc.Infrastructure
                 {
                     g.FillRectangle(brush, rect);
 
+                    // Set up the text format.
+                    var format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center,
+                        FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip,
+                        Trimming = StringTrimming.None
+                    };
+
+                    format.SetMeasurableCharacterRanges(new[] { new CharacterRange(0, text.Length) });
+
                     // Set up the text font.
-                    SizeF size;
+                    RectangleF size;
                     float fontSize = rect.Height + 1;
-                    Font font;
+                    Font font = null;
                     // Adjust the font size until the text fits within the image.
                     do
                     {
+                        if (font != null)
+                            font.Dispose();
                         fontSize--;
                         font = new Font(
                             familyName,
                             fontSize,
                             FontStyle.Bold);
-                        size = g.MeasureString(text, font);
-                    } while (size.Width > rect.Width);
-
-                    // Set up the text format.
-                    var format = new StringFormat
-                                     {
-                                         Alignment = StringAlignment.Center,
-                                         LineAlignment = StringAlignment.Center
-                                     };
-
+                        size = g.MeasureCharacterRanges(text, font, rect, format)[0].GetBounds(g);
+                    } while (size.Width > rect.Width || size.Height > rect.Height);
+                    // Check http://stackoverflow.com/questions/2292812/font-in-graphicspath-addstring-is-smaller-than-usual-font on why we have to convert to em
                     // Create a path using the text and warp it randomly.
                     var path = new GraphicsPath();
                     path.AddString(
                         text,
                         font.FontFamily,
-                        (int) font.Style,
-                        font.Size, rect,
+                        (int)font.Style,
+                        g.DpiY * font.Size / 72, rect,
                         format);
+
                     PointF[] points =
                         {
                             new PointF(
@@ -161,7 +168,7 @@ namespace CaptchaMvc.Infrastructure
 
                         // Add some random noise.
                         int m = Math.Max(rect.Width, rect.Height);
-                        for (int i = 0; i < (int) (rect.Width*rect.Height/30F); i++)
+                        for (int i = 0; i < (int)(rect.Width * rect.Height / 30F); i++)
                         {
                             int x = random.Next(rect.Width);
                             int y = random.Next(rect.Height);

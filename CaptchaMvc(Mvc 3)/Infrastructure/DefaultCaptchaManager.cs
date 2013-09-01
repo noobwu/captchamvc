@@ -53,7 +53,7 @@ namespace CaptchaMvc.Infrastructure
             Validate.ArgumentNotNullOrEmpty(imageElementName, "imageElementName");
             Validate.ArgumentNotNullOrEmpty(tokenElementName, "tokenElementName");
 
-            IntelligencePolicy = new FakeInputIntelligencePolicy(this);
+            IntelligencePolicy = new FakeInputIntelligencePolicy();
             StorageProvider = storageProvider;
             TokenParameterName = tokenParameterName;
             InputElementName = inputElementName;
@@ -68,6 +68,7 @@ namespace CaptchaMvc.Infrastructure
             DrawingModelFactory = CreateDrawingModel;
             CharactersFactory = GetCharacters;
 #pragma warning restore 612,618
+            AddAreaRouteValue = true;
         }
 
         #endregion
@@ -216,58 +217,6 @@ namespace CaptchaMvc.Infrastructure
             }
         }
 
-        /// <summary>
-        ///     Gets or sets the name for a token parameter.
-        /// </summary>
-        public string TokenParameterName
-        {
-            get { return _tokenParameterName; }
-            set
-            {
-                Validate.PropertyNotNullOrEmpty(value, "TokenParameterName");
-                _tokenParameterName = value;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets the name for an input element in DOM.
-        /// </summary>
-        public string InputElementName
-        {
-            get { return _inputElementName; }
-            set
-            {
-                Validate.PropertyNotNullOrEmpty(value, "InputElementName");
-                _inputElementName = value;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets the name for image element in DOM.
-        /// </summary>
-        public string ImageElementName
-        {
-            get { return _imageElementName; }
-            set
-            {
-                Validate.PropertyNotNullOrEmpty(value, "ImageElementName");
-                _imageElementName = value;
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets the name for token element in DOM.
-        /// </summary>
-        public string TokenElementName
-        {
-            get { return _tokenElementName; }
-            set
-            {
-                Validate.PropertyNotNullOrEmpty(value, "TokenElementName");
-                _tokenElementName = value;
-            }
-        }
-
         #endregion
 
         #region Methods
@@ -358,6 +307,23 @@ namespace CaptchaMvc.Infrastructure
         }
 
         /// <summary>
+        ///     Writes an error message.
+        /// </summary>
+        /// <param name="controllerBase">
+        ///     The specified <see cref="ControllerBase" />.
+        /// </param>
+        /// <param name="parameterContainer">
+        ///     The specified <see cref="IParameterContainer" />.
+        /// </param>
+        protected virtual void WriteError(ControllerBase controllerBase, IParameterContainer parameterContainer)
+        {
+            string errorText;
+            parameterContainer.TryGet(ErrorAttribute, out errorText, "The captcha is not valid");
+            controllerBase.ViewData.ModelState.AddModelError(InputElementName, errorText);
+            controllerBase.ViewData[CaptchaNotValidViewDataKey] = true;
+        }
+
+        /// <summary>
         ///     Creates a new <see cref="IDrawingModel" /> for drawing a captcha.
         /// </summary>
         /// <param name="parameterContainer">
@@ -369,8 +335,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of <see cref="IDrawingModel" />.
         /// </returns>
-        [Obsolete("Use the DrawingModelFactory property.")]
-        protected virtual IDrawingModel CreateDrawingModel(IParameterContainer parameterContainer,
+        private static IDrawingModel CreateDrawingModel(IParameterContainer parameterContainer,
                                                            ICaptchaValue captchaValue)
         {
             return new DefaultDrawingModel(captchaValue.CaptchaText);
@@ -382,8 +347,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of <see cref="KeyValuePair{TKey,TValue}" />.
         /// </returns>
-        [Obsolete("Use the MathCaptchaPairFactory property.")]
-        protected virtual KeyValuePair<string, ICaptchaValue> GenerateMathCaptcha()
+        private static KeyValuePair<string, ICaptchaValue> GenerateMathCaptcha()
         {
             int first, second;
             string text;
@@ -417,8 +381,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of <see cref="KeyValuePair{TKey,TValue}" />.
         /// </returns>
-        [Obsolete("Use the PlainCaptchaPairFactory property.")]
-        protected virtual KeyValuePair<string, ICaptchaValue> GenerateSimpleCaptcha(int length)
+        private KeyValuePair<string, ICaptchaValue> GenerateSimpleCaptcha(int length)
         {
             string randomText = RandomText.Generate(CharactersFactory(), length);
             return new KeyValuePair<string, ICaptchaValue>(Guid.NewGuid().ToString("N"),
@@ -435,11 +398,12 @@ namespace CaptchaMvc.Infrastructure
         ///     The specified <see cref="KeyValuePair{TKey,TValue}" />.
         /// </param>
         /// <returns>The url of captcha image.</returns>
-        [Obsolete("Use the ImageUrlFactory property.")]
-        protected virtual string GenerateImageUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
+        private string GenerateImageUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
         {
-            return urlHelper.Action("Generate", "DefaultCaptcha",
-                                    new RouteValueDictionary { { TokenParameterName, captchaPair.Key } });
+            var routeValueDictionary = new RouteValueDictionary { { TokenParameterName, captchaPair.Key } };
+            if (AddAreaRouteValue)
+                routeValueDictionary.Add("area", "");
+            return urlHelper.Action("Generate", "DefaultCaptcha", routeValueDictionary);
         }
 
         /// <summary>
@@ -452,9 +416,10 @@ namespace CaptchaMvc.Infrastructure
         ///     The specified <see cref="KeyValuePair{TKey,TValue}" />.
         /// </param>
         /// <returns>The url to refresh captcha.</returns>
-        [Obsolete("Use the RefreshUrlFactory property.")]
-        protected virtual string GenerateRefreshUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
+        private string GenerateRefreshUrl(UrlHelper urlHelper, KeyValuePair<string, ICaptchaValue> captchaPair)
         {
+            if (AddAreaRouteValue)
+                return urlHelper.Action("Refresh", "DefaultCaptcha", new { area = "" });
             return urlHelper.Action("Refresh", "DefaultCaptcha");
         }
 
@@ -464,8 +429,7 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of <see cref="string" />.
         /// </returns>
-        [Obsolete("Use the CharactersFactory property.")]
-        protected virtual string GetCharacters()
+        private static string GetCharacters()
         {
             string chars = ConfigurationManager.AppSettings["CaptchaChars"];
             if (string.IsNullOrEmpty(chars))
@@ -473,26 +437,66 @@ namespace CaptchaMvc.Infrastructure
             return chars;
         }
 
-        /// <summary>
-        ///     Writes an error message.
-        /// </summary>
-        /// <param name="controllerBase">
-        ///     The specified <see cref="ControllerBase" />.
-        /// </param>
-        /// <param name="parameterContainer">
-        ///     The specified <see cref="IParameterContainer" />.
-        /// </param>
-        protected virtual void WriteError(ControllerBase controllerBase, IParameterContainer parameterContainer)
-        {
-            string errorText;
-            parameterContainer.TryGet(ErrorAttribute, out errorText, "The captcha is not valid");
-            controllerBase.ViewData.ModelState.AddModelError(InputElementName, errorText);
-            controllerBase.ViewData[CaptchaNotValidViewDataKey] = true;
-        }
-
         #endregion
 
         #region Implementation of ICaptchaManager
+
+        /// <summary>
+        ///     Gets or sets the name for a token parameter.
+        /// </summary>
+        public string TokenParameterName
+        {
+            get { return _tokenParameterName; }
+            set
+            {
+                Validate.PropertyNotNullOrEmpty(value, "TokenParameterName");
+                _tokenParameterName = value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the name for an input element in DOM.
+        /// </summary>
+        public string InputElementName
+        {
+            get { return _inputElementName; }
+            set
+            {
+                Validate.PropertyNotNullOrEmpty(value, "InputElementName");
+                _inputElementName = value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the name for image element in DOM.
+        /// </summary>
+        public string ImageElementName
+        {
+            get { return _imageElementName; }
+            set
+            {
+                Validate.PropertyNotNullOrEmpty(value, "ImageElementName");
+                _imageElementName = value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the name for token element in DOM.
+        /// </summary>
+        public string TokenElementName
+        {
+            get { return _tokenElementName; }
+            set
+            {
+                Validate.PropertyNotNullOrEmpty(value, "TokenElementName");
+                _tokenElementName = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets value that indicates that the current manager will add area route value in generated url.
+        /// </summary>
+        public bool AddAreaRouteValue { get; set; }
 
         /// <summary>
         ///     Gets or sets the storage to save a captcha tokens.
@@ -629,14 +633,14 @@ namespace CaptchaMvc.Infrastructure
             Validate.ArgumentNotNull(parameterContainer, "parameterContainer");
             if (IntelligencePolicy != null)
             {
-                var isValid = IntelligencePolicy.IsValid(controller, parameterContainer);
+                var isValid = IntelligencePolicy.IsValid(this, controller, parameterContainer);
                 if (isValid.HasValue)
                 {
                     if (isValid.Value)
                         return true;
                     WriteError(controller, parameterContainer);
                     return false;
-                }    
+                }
             }
             ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
             if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))

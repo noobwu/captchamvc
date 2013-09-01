@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using CaptchaMvc.Interface;
 
 namespace CaptchaMvc.Infrastructure
@@ -33,7 +31,7 @@ namespace CaptchaMvc.Infrastructure
         ///     Initializes a new instance of the <see cref="SessionStorageProvider" /> class.
         /// </summary>
         /// <param name="maxCount">Gets or sets the maximum values.</param>
-        public SessionStorageProvider(int maxCount)
+        public SessionStorageProvider(uint maxCount)
         {
             MaxCount = maxCount;
         }
@@ -51,8 +49,8 @@ namespace CaptchaMvc.Infrastructure
         public virtual void Add(KeyValuePair<string, ICaptchaValue> captchaPair)
         {
             Validate.ArgumentNotNull(captchaPair.Value, "captchaPair");
-            ClearIfNeed(DrawingKeys);
-            ClearIfNeed(ValidateKeys);
+            DrawingKeys.ClearIfNeed(MaxCount);
+            ValidateKeys.ClearIfNeed(MaxCount);
             DrawingKeys.Add(captchaPair);
             ValidateKeys.Add(captchaPair);
         }
@@ -124,16 +122,16 @@ namespace CaptchaMvc.Infrastructure
         #region Properties
 
         /// <summary>
-        ///     Gets or sets the maximum values.
+        ///     Gets or sets the maximum size of session values.
         /// </summary>
-        public int MaxCount { get; set; }
+        public uint MaxCount { get; set; }
 
         /// <summary>
         ///     Contains tokens that have not yet been validated.
         /// </summary>
         protected IDictionary<string, ICaptchaValue> ValidateKeys
         {
-            get { return GetDictionaryFromSession(SessionValidateKey); }
+            get { return CaptchaUtils.GetFromSession(SessionValidateKey, () => new ConcurrentDictionary<string, ICaptchaValue>()); }
         }
 
         /// <summary>
@@ -141,31 +139,7 @@ namespace CaptchaMvc.Infrastructure
         /// </summary>
         protected IDictionary<string, ICaptchaValue> DrawingKeys
         {
-            get { return GetDictionaryFromSession(SessionDrawingKey); }
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void ClearIfNeed(IDictionary<string, ICaptchaValue> dictionary)
-        {
-            //Remove the two value from a session.
-            if (dictionary.Count < MaxCount) return;
-            dictionary.Remove(dictionary.Keys.First());
-            if (dictionary.Count == 0) return;
-            dictionary.Remove(dictionary.Keys.First());
-        }
-
-        private static IDictionary<string, ICaptchaValue> GetDictionaryFromSession(string key)
-        {
-            var dictionary = HttpContext.Current.Session[key] as IDictionary<string, ICaptchaValue>;
-            if (dictionary == null)
-            {
-                dictionary = new ConcurrentDictionary<string, ICaptchaValue>();
-                HttpContext.Current.Session[key] = dictionary;
-            }
-            return dictionary;
+            get { return CaptchaUtils.GetFromSession(SessionDrawingKey, () => new ConcurrentDictionary<string, ICaptchaValue>()); }
         }
 
         #endregion

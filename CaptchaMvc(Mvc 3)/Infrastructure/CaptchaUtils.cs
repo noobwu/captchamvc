@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using CaptchaMvc.Interface;
 using CaptchaMvc.Models;
@@ -218,6 +221,37 @@ namespace CaptchaMvc.Infrastructure
 
         #region Internal methods
 
+        internal static T GetFromSession<T>(string key, Func<T> getItem) where T : class
+        {
+            var item = HttpContext.Current.Session[key] as T;
+            if (item == null)
+            {
+                item = getItem();
+                HttpContext.Current.Session[key] = item;
+            }
+            return item;
+        }
+
+        internal static void ClearIfNeed<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, uint maxCount)
+        {
+            //Remove the two value from a session.
+            if (dictionary.Count < maxCount) return;
+            dictionary.Remove(dictionary.Keys.First());
+
+            if (dictionary.Count == 0) return;
+            dictionary.Remove(dictionary.Keys.First());
+        }
+
+        internal static void ClearIfNeed<TKey>(this HashSet<TKey> hashSet, uint maxCount)
+        {
+            //Remove the two value from a session.
+            if (hashSet.Count < maxCount) return;
+            hashSet.Remove(hashSet.First());
+
+            if (hashSet.Count == 0) return;
+            hashSet.Remove(hashSet.First());
+        }
+
         internal static List<ParameterModel> GetParameters(ParameterModel[] parameters)
         {
             var list = new List<ParameterModel>();
@@ -237,7 +271,7 @@ namespace CaptchaMvc.Infrastructure
                         string.Format(
                             "When load the {1}. Type the name of the {0} can not be found in assemblies.",
                             nameType, configName));
-                return (T) type.Assembly.CreateInstance(type.FullName, true);
+                return (T)type.Assembly.CreateInstance(type.FullName, true);
             }
             T service;
             if (!TryGetService(out service))
@@ -272,7 +306,7 @@ namespace CaptchaMvc.Infrastructure
                 result = defaultValue;
                 return false;
             }
-            result = (T) parameter.Value;
+            result = (T)parameter.Value;
             return true;
         }
 
@@ -292,7 +326,7 @@ namespace CaptchaMvc.Infrastructure
             ParameterModel parameter = parameters.FirstOrDefault(model => model.Name.Equals(name));
             if (parameter == null)
                 return default(T);
-            return (T) parameter.Value;
+            return (T)parameter.Value;
         }
 
         /// <summary>

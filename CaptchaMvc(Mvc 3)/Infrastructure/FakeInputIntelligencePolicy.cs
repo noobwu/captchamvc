@@ -1,22 +1,26 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
 using CaptchaMvc.Interface;
 using CaptchaMvc.Models;
 
 namespace CaptchaMvc.Infrastructure
 {
     /// <summary>
-    ///     Represents the policy which makes a captcha intelligence using a fake input element.
+    ///     Represents the policy which makes a captcha as intelligent using a fake input element.
     /// </summary>
     public class FakeInputIntelligencePolicy : IIntelligencePolicy
     {
         #region Fields
+
+        private const string PolicyType = "fi";
+        private const string SessionKey = "fiintelligencevalues";
 
         private const string StyleCss = "<style>#{0} {{ display: none; }}</style>";
 
         private const string InputHtml =
             @"<input type=""hidden"" value=""{0}"" name=""{1}"" id=""{1}""/><input type=""text"" value="""" name=""{2}"" id=""{2}""/>";
 
-        private readonly DefaultCaptchaManager _captchaManager;
         private string _fakeInputName;
 
         #endregion
@@ -26,13 +30,21 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         ///     Initializes a new instance of the <see cref="FakeInputIntelligencePolicy" /> class.
         /// </summary>
-        public FakeInputIntelligencePolicy(DefaultCaptchaManager captchaManager, string fakeInputName = null)
+        public FakeInputIntelligencePolicy(string fakeInputName = null)
+            : this(StorageType.Session, fakeInputName)
         {
-            Validate.ArgumentNotNull(captchaManager, "captchaManager");
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FakeInputIntelligencePolicy" /> class.
+        /// </summary>
+        public FakeInputIntelligencePolicy(StorageType storageType, string fakeInputName = null)
+        {
             if (string.IsNullOrEmpty(fakeInputName))
                 fakeInputName = "email_required_value";
-            _captchaManager = captchaManager;
             _fakeInputName = fakeInputName;
+            StorageType = storageType;
+            SessionValuesMaxCount = 10;
         }
 
         #endregion
@@ -52,13 +64,24 @@ namespace CaptchaMvc.Infrastructure
             }
         }
 
+        /// <summary>
+        ///     Gets the type of storage that will be used for store a data.
+        /// </summary>
+        public StorageType StorageType { get; private set; }
+
+        /// <summary>
+        ///     Gets or sets the maximum size of session values.
+        /// </summary>
+        public uint SessionValuesMaxCount { get; set; }
+
         #endregion
 
         #region Implementation of IIntelligencePolicy
 
         /// <summary>
-        ///     Determines whether the intelligence captcha is valid.
+        ///     Determines whether the intelligent captcha is valid.
         /// </summary>
+        /// <param name="captchaManager">The specified captcha manager.</param>
         /// <param name="controller">
         ///     The specified <see cref="ControllerBase" />.
         /// </param>
@@ -66,23 +89,30 @@ namespace CaptchaMvc.Infrastructure
         ///     The specified <see cref="IParameterContainer" />.
         /// </param>
         /// <returns>
-        ///     <c>True</c> if the intelligence captcha is valid; <c>false</c> not valid; <c>null</c> is not intelligence captcha.
+        ///     <c>True</c> if the intelligent captcha is valid; <c>false</c> not valid; <c>null</c> is not intelligent captcha.
         /// </returns>
-        public bool? IsValid(ControllerBase controller, IParameterContainer parameterContainer)
+        public virtual bool? IsValid(ICaptchaManager captchaManager, ControllerBase controller, IParameterContainer parameterContainer)
         {
-            ValueProviderResult tokenValue = controller.ValueProvider.GetValue(_captchaManager.TokenElementName);
+            Validate.ArgumentNotNull(captchaManager, "captchaManager");
+            Validate.ArgumentNotNull(controller, "controller");
+            ValueProviderResult tokenValue = controller
+                .ValueProvider
+                .GetValue(captchaManager.TokenElementName + PolicyType);
+
             if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))
                 return null;
-            if (!controller.TempData.Remove(tokenValue.AttemptedValue))
+            if (!RemoveTokenValue(controller, tokenValue.AttemptedValue))
                 return null;
+
             ValueProviderResult fakeValue = controller.ValueProvider.GetValue(FakeInputName);
-            return fakeValue != null && _captchaManager.StorageProvider.Remove(tokenValue.AttemptedValue) &&
+            return captchaManager.StorageProvider.Remove(tokenValue.AttemptedValue) && fakeValue != null &&
                    string.IsNullOrEmpty(fakeValue.AttemptedValue);
         }
 
         /// <summary>
         ///     Makes the specified captcha "intelligent".
         /// </summary>
+        /// <param name="captchaManager">The specified captcha manager.</param>
         /// <param name="captcha">
         ///     The specified <see cref="ICaptcha" />.
         /// </param>
@@ -92,15 +122,18 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of <see cref="ICaptcha" />.
         /// </returns>
-        public ICaptcha MakeIntelligent(ICaptcha captcha, IParameterContainer parameterContainer)
+        public virtual ICaptcha MakeIntelligent(ICaptchaManager captchaManager, ICaptcha captcha, IParameterContainer parameterContainer)
         {
+            Validate.ArgumentNotNull(captchaManager, "captchaManager");
             Validate.ArgumentNotNull(captcha, "captcha");
             if (captcha.BuildInfo.HtmlHelper.ViewData[DefaultCaptchaManager.CaptchaNotValidViewDataKey] != null)
                 return captcha;
-            if (captcha is IntelligentCaptchaDecorator)
+            var captchaDecorator = captcha as IntelligentCaptchaDecorator;
+            if (captchaDecorator != null && captchaDecorator.PolicyType.Equals(PolicyType))
                 return captcha;
-            captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
-            return new IntelligentCaptchaDecorator(captcha, RenderMarkup, RenderScript);
+            SaveTokenValue(captcha);
+            var tokenName = captchaManager.TokenElementName + PolicyType;
+            return new IntelligentCaptchaDecorator(captcha, c => RenderMarkup(c, tokenName), RenderScript, PolicyType);
         }
 
         #endregion
@@ -113,10 +146,9 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of string.
         /// </returns>
-        protected virtual string RenderMarkup(ICaptcha captcha)
+        private string RenderMarkup(ICaptcha captcha, string tokenElementName)
         {
-            return string.Format(InputHtml, captcha.BuildInfo.TokenValue, captcha.BuildInfo.TokenElementId,
-                                 FakeInputName);
+            return string.Format(InputHtml, captcha.BuildInfo.TokenValue, tokenElementName, FakeInputName);
         }
 
         /// <summary>
@@ -125,9 +157,40 @@ namespace CaptchaMvc.Infrastructure
         /// <returns>
         ///     An instance of string.
         /// </returns>
-        protected virtual string RenderScript(ICaptcha captcha)
+        private string RenderScript(ICaptcha captcha)
         {
             return string.Format(StyleCss, FakeInputName);
+        }
+
+        private void SaveTokenValue(ICaptcha captcha)
+        {
+            switch (StorageType)
+            {
+                case StorageType.TempData:
+                    captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
+                    break;
+                case StorageType.Session:
+                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
+                    hashSet.ClearIfNeed(SessionValuesMaxCount);
+                    hashSet.Add(captcha.BuildInfo.TokenValue);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private bool RemoveTokenValue(ControllerBase controller, string value)
+        {
+            switch (StorageType)
+            {
+                case StorageType.TempData:
+                    return controller.TempData.Remove(value);
+                case StorageType.Session:
+                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
+                    return hashSet.Remove(value);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         #endregion

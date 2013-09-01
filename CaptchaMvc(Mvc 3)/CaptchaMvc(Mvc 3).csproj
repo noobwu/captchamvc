@@ -61,11 +61,13 @@
     <Compile Include="Infrastructure\FakeInputIntelligencePolicy.cs" />
     <Compile Include="Infrastructure\JavaScriptIntelligencePolicy.cs" />
     <Compile Include="Infrastructure\MathCaptchaBuilder.cs" />
+    <Compile Include="Infrastructure\MultiIntelligencePolicy.cs" />
     <Compile Include="Infrastructure\ParameterModelContainer.cs" />
     <Compile Include="Infrastructure\PartialCaptchaBuilder.cs" />
     <Compile Include="Infrastructure\RandomNumber.cs" />
     <Compile Include="Infrastructure\RandomText.cs" />
     <Compile Include="Infrastructure\RequestParameterContainer.cs" />
+    <Compile Include="Infrastructure\ResponseTimeIntelligencePolicy.cs" />
     <Compile Include="Infrastructure\SessionStorageProvider.cs" />
     <Compile Include="Infrastructure\Validate.cs" />
     <Compile Include="Interface\IBuildInfoModel.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Models\NumberCaptchaValue.cs" />
     <Compile Include="Models\ParameterModel.cs" />
     <Compile Include="Models\PartialBuildInfoModel.cs" />
+    <Compile Include="Models\StorageType.cs" />
     <Compile Include="Models\StringCaptchaValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

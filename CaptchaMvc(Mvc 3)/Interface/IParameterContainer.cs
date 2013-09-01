@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CaptchaMvc.Interface
+﻿namespace CaptchaMvc.Interface
 {
     /// <summary>
     ///     Represents a container with values​​.
@@ -20,16 +18,6 @@ namespace CaptchaMvc.Interface
         ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
         /// </returns>
         bool IsContains(string key);
-
-        /// <summary>
-        ///     Determines whether the <see cref="IParameterContainer" /> contains a specific key.
-        /// </summary>
-        /// <param name="key">The specified key.</param>
-        /// <returns>
-        ///     <c>True</c> if the value is found in the <see cref="IParameterContainer" />; otherwise, <c>false</c>.
-        /// </returns>
-        [Obsolete("Use the IsContains method.")]
-        bool IsContain(string key);
 
         /// <summary>
         ///     Gets the value associated with the specified key.

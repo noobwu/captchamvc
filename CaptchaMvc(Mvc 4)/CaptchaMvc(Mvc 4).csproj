@@ -89,6 +89,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MathCaptchaBuilder.cs">
       <Link>Infrastructure\MathCaptchaBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MultiIntelligencePolicy.cs">
+      <Link>Infrastructure\MultiIntelligencePolicy.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\ParameterModelContainer.cs">
       <Link>Infrastructure\ParameterModelContainer.cs</Link>
     </Compile>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RequestParameterContainer.cs">
       <Link>Infrastructure\RequestParameterContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\ResponseTimeIntelligencePolicy.cs">
+      <Link>Infrastructure\ResponseTimeIntelligencePolicy.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\SessionStorageProvider.cs">
       <Link>Infrastructure\SessionStorageProvider.cs</Link>
@@ -178,6 +184,9 @@
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\PartialBuildInfoModel.cs">
       <Link>Models\PartialBuildInfoModel.cs</Link>
+    </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\StorageType.cs">
+      <Link>Models\StorageType.cs</Link>
     </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\StringCaptchaValue.cs">
       <Link>Models\StringCaptchaValue.cs</Link>
