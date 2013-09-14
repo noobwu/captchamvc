@@ -89,6 +89,7 @@
     <Compile Include="Models\DefaultDrawingModel.cs" />
     <Compile Include="Models\DefaultUpdateInfoModel.cs" />
     <Compile Include="Models\IntelligentCaptchaDecorator.cs" />
+    <Compile Include="Models\KeyTimeEntry.cs" />
     <Compile Include="Models\MathBuildInfoModel.cs" />
     <Compile Include="Models\NumberCaptchaValue.cs" />
     <Compile Include="Models\ParameterModel.cs" />

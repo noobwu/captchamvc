@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -232,24 +230,26 @@ namespace CaptchaMvc.Infrastructure
             return item;
         }
 
-        internal static void ClearIfNeed<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, uint maxCount)
+        internal static void ClearIfNeed<TKey, TValue>(this IDictionary<KeyTimeEntry<TKey>, TValue> dictionary, uint maxCount)
         {
-            //Remove the two value from a session.
             if (dictionary.Count < maxCount) return;
-            dictionary.Remove(dictionary.Keys.First());
-
-            if (dictionary.Count == 0) return;
-            dictionary.Remove(dictionary.Keys.First());
+            var list = new List<KeyTimeEntry<TKey>>(5);
+            list.AddRange(dictionary.Keys.OrderBy(entry => entry.Timestamp).Take(5));
+            foreach (var source in list)
+            {
+                dictionary.Remove(source);
+            }
         }
 
-        internal static void ClearIfNeed<TKey>(this HashSet<TKey> hashSet, uint maxCount)
+        internal static void ClearIfNeed<TKey>(this HashSet<KeyTimeEntry<TKey>> hashSet, uint maxCount)
         {
-            //Remove the two value from a session.
             if (hashSet.Count < maxCount) return;
-            hashSet.Remove(hashSet.First());
-
-            if (hashSet.Count == 0) return;
-            hashSet.Remove(hashSet.First());
+            var list = new List<KeyTimeEntry<TKey>>(5);
+            list.AddRange(hashSet.OrderBy(entry => entry.Timestamp).Take(5));
+            foreach (var source in list)
+            {
+                hashSet.Remove(source);
+            }
         }
 
         internal static List<ParameterModel> GetParameters(ParameterModel[] parameters)

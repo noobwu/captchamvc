@@ -46,7 +46,7 @@ namespace CaptchaMvc.Infrastructure
                 validationInputName = "validation_token";
             _validationInputName = validationInputName;
             StorageType = storageType;
-            SessionValuesMaxCount = 10;
+            SessionValuesMaxCount = 15;
         }
 
         #endregion
@@ -177,7 +177,7 @@ namespace CaptchaMvc.Infrastructure
                     captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = true;
                     break;
                 case StorageType.Session:
-                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
+                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<KeyTimeEntry<string>>());
                     hashSet.ClearIfNeed(SessionValuesMaxCount);
                     hashSet.Add(captcha.BuildInfo.TokenValue);
                     break;
@@ -193,7 +193,7 @@ namespace CaptchaMvc.Infrastructure
                 case StorageType.TempData:
                     return controller.TempData.Remove(value);
                 case StorageType.Session:
-                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<string>());
+                    var hashSet = CaptchaUtils.GetFromSession(SessionKey, () => new HashSet<KeyTimeEntry<string>>());
                     return hashSet.Remove(value);
                 default:
                     throw new ArgumentOutOfRangeException();

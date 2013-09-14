@@ -38,7 +38,7 @@ namespace CaptchaMvc.Infrastructure
         {
             StorageType = storageType;
             MinResponseTime = minResponseTime;
-            SessionValuesMaxCount = 10;
+            SessionValuesMaxCount = 15;
         }
 
         #endregion
@@ -154,8 +154,7 @@ namespace CaptchaMvc.Infrastructure
                     captcha.BuildInfo.HtmlHelper.ViewContext.TempData[captcha.BuildInfo.TokenValue] = DateTime.UtcNow;
                     break;
                 case StorageType.Session:
-                    ConcurrentDictionary<string, DateTime> dictionary = CaptchaUtils.GetFromSession(SessionKey,
-                        () => new ConcurrentDictionary<string, DateTime>());
+                    var dictionary = CaptchaUtils.GetFromSession(SessionKey, () => new ConcurrentDictionary<KeyTimeEntry<string>, DateTime>());
                     dictionary.ClearIfNeed(SessionValuesMaxCount);
                     dictionary.TryAdd(captcha.BuildInfo.TokenValue, DateTime.UtcNow);
                     break;
@@ -177,8 +176,7 @@ namespace CaptchaMvc.Infrastructure
                     }
                     return null;
                 case StorageType.Session:
-                    ConcurrentDictionary<string, DateTime> dictionary = CaptchaUtils.GetFromSession(SessionKey,
-                        () => new ConcurrentDictionary<string, DateTime>());
+                    var dictionary = CaptchaUtils.GetFromSession(SessionKey, () => new ConcurrentDictionary<KeyTimeEntry<string>, DateTime>());
                     DateTime time;
                     if (dictionary.TryRemove(value, out time))
                         return time;

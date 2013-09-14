@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CaptchaMvc.Interface;
+using CaptchaMvc.Models;
 
 namespace CaptchaMvc.Infrastructure
 {
@@ -23,7 +24,7 @@ namespace CaptchaMvc.Infrastructure
         ///     Initializes a new instance of the <see cref="SessionStorageProvider" /> class.
         /// </summary>
         public SessionStorageProvider()
-            : this(10)
+            : this(15)
         {
         }
 
@@ -51,8 +52,9 @@ namespace CaptchaMvc.Infrastructure
             Validate.ArgumentNotNull(captchaPair.Value, "captchaPair");
             DrawingKeys.ClearIfNeed(MaxCount);
             ValidateKeys.ClearIfNeed(MaxCount);
-            DrawingKeys.Add(captchaPair);
-            ValidateKeys.Add(captchaPair);
+            var entry = new KeyTimeEntry<string>(captchaPair.Key);
+            DrawingKeys.Add(entry, captchaPair.Value);
+            ValidateKeys.Add(entry, captchaPair.Value);
         }
 
         /// <summary>
@@ -129,17 +131,17 @@ namespace CaptchaMvc.Infrastructure
         /// <summary>
         ///     Contains tokens that have not yet been validated.
         /// </summary>
-        protected IDictionary<string, ICaptchaValue> ValidateKeys
+        protected IDictionary<KeyTimeEntry<string>, ICaptchaValue> ValidateKeys
         {
-            get { return CaptchaUtils.GetFromSession(SessionValidateKey, () => new ConcurrentDictionary<string, ICaptchaValue>()); }
+            get { return CaptchaUtils.GetFromSession(SessionValidateKey, () => new ConcurrentDictionary<KeyTimeEntry<string>, ICaptchaValue>()); }
         }
 
         /// <summary>
         ///     Contains tokens that have not yet been displayed.
         /// </summary>
-        protected IDictionary<string, ICaptchaValue> DrawingKeys
+        protected IDictionary<KeyTimeEntry<string>, ICaptchaValue> DrawingKeys
         {
-            get { return CaptchaUtils.GetFromSession(SessionDrawingKey, () => new ConcurrentDictionary<string, ICaptchaValue>()); }
+            get { return CaptchaUtils.GetFromSession(SessionDrawingKey, () => new ConcurrentDictionary<KeyTimeEntry<string>, ICaptchaValue>()); }
         }
 
         #endregion

@@ -173,6 +173,9 @@
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\IntelligentCaptchaDecorator.cs">
       <Link>Models\IntelligentCaptchaDecorator.cs</Link>
     </Compile>
+    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\KeyTimeEntry.cs">
+      <Link>Models\KeyTimeEntry.cs</Link>
+    </Compile>
     <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\MathBuildInfoModel.cs">
       <Link>Models\MathBuildInfoModel.cs</Link>
     </Compile>
