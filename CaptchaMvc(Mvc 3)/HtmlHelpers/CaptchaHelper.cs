@@ -272,22 +272,6 @@ namespace CaptchaMvc.HtmlHelpers
         ///     The specified <see cref="ControllerBase" />.
         /// </param>
         /// <param name="errorText">The specified error message.</param>
-        /// <returns>
-        ///     <c>True</c> if the captcha is valid; otherwise, <c>false</c>.
-        /// </returns>
-        [Obsolete("Use the IsCaptchaValid method.")]
-        public static bool IsCaptchaVerify(this ControllerBase controllerBase, string errorText)
-        {
-            return IsCaptchaValid(controllerBase, errorText);
-        }
-
-        /// <summary>
-        ///     Determines whether the captcha is valid, and write error message if need.
-        /// </summary>
-        /// <param name="controllerBase">
-        ///     The specified <see cref="ControllerBase" />.
-        /// </param>
-        /// <param name="errorText">The specified error message.</param>
         /// <param name="parameters">The specified parameters, if any.</param>
         /// <returns>
         ///     <c>True</c> if the captcha is valid; otherwise, <c>false</c>.

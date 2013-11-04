@@ -8,7 +8,7 @@ namespace CaptchaMvc.Controllers
     /// <summary>
     ///     Represents the controller that is responsible for creating and updating captcha.
     /// </summary>
-#if MVC4
+#if !MVC3
     [AllowAnonymous]
 #endif
     public class DefaultCaptchaController : Controller

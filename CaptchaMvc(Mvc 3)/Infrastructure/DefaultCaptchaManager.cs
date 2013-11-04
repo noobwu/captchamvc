@@ -60,14 +60,12 @@ namespace CaptchaMvc.Infrastructure
             ImageElementName = imageElementName;
             TokenElementName = tokenElementName;
 
-#pragma warning disable 612,618
             ImageUrlFactory = GenerateImageUrl;
             RefreshUrlFactory = GenerateRefreshUrl;
             MathCaptchaPairFactory = GenerateMathCaptcha;
             PlainCaptchaPairFactory = GenerateSimpleCaptcha;
             DrawingModelFactory = CreateDrawingModel;
             CharactersFactory = GetCharacters;
-#pragma warning restore 612,618
             AddAreaRouteValue = true;
         }
 
@@ -643,16 +641,14 @@ namespace CaptchaMvc.Infrastructure
                 }
             }
             ValueProviderResult tokenValue = controller.ValueProvider.GetValue(TokenElementName);
-            if (tokenValue == null || string.IsNullOrEmpty(tokenValue.AttemptedValue))
-                throw new ArgumentException("The parameterContainer does not contain a token value.");
             ValueProviderResult inputText = controller.ValueProvider.GetValue(InputElementName);
-            if (inputText == null)
-                throw new ArgumentException("The parameterContainer does not contain a captcha input value.");
-
-            ICaptchaValue captchaValue = StorageProvider.GetValue(tokenValue.AttemptedValue, TokenType.Validation);
-            if (captchaValue != null && !string.IsNullOrEmpty(inputText.AttemptedValue) &&
-                captchaValue.IsEqual(inputText.AttemptedValue))
-                return true;
+            if (tokenValue != null && !string.IsNullOrEmpty(tokenValue.AttemptedValue) && inputText != null)
+            {
+                ICaptchaValue captchaValue = StorageProvider.GetValue(tokenValue.AttemptedValue, TokenType.Validation);
+                if (captchaValue != null && !string.IsNullOrEmpty(inputText.AttemptedValue) &&
+                    captchaValue.IsEqual(inputText.AttemptedValue))
+                    return true;
+            }
             WriteError(controller, parameterContainer);
             return false;
         }

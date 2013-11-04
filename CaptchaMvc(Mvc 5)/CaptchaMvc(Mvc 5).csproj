@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DDE703E5-5514-4A3C-A06E-4F1169C4B3E8}</ProjectGuid>
+    <ProjectGuid>{35BDA285-849C-4116-A98C-CC9404950189}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CaptchaMvc</RootNamespace>
     <AssemblyName>CaptchaMvc</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -24,11 +24,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Release\Mvc 4\</OutputPath>
+    <OutputPath>..\Release\Mvc 5\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\Release\Mvc 4\CaptchaMvc.XML</DocumentationFile>
+    <DocumentationFile>..\Release\Mvc 5\CaptchaMvc.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -43,160 +43,169 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Mvc, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Annotations\JetBrains.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\annotations\JetBrains.cs">
       <Link>Annotations\JetBrains.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Attributes\CaptchaVerifyAttribute.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\attributes\CaptchaVerifyAttribute.cs">
       <Link>Attributes\CaptchaVerifyAttribute.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Controllers\DefaultCaptchaController.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\controllers\DefaultCaptchaController.cs">
       <Link>Controllers\DefaultCaptchaController.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\HtmlHelpers\CaptchaHelper.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\htmlhelpers\CaptchaHelper.cs">
       <Link>HtmlHelpers\CaptchaHelper.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\CaptchaUtils.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\CaptchaUtils.cs">
       <Link>Infrastructure\CaptchaUtils.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\CombinedParameterContainer.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\CombinedParameterContainer.cs">
       <Link>Infrastructure\CombinedParameterContainer.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\CookieStorageProvider.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\CookieStorageProvider.cs">
       <Link>Infrastructure\CookieStorageProvider.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultCaptchaBuilder.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\DefaultCaptchaBuilder.cs">
       <Link>Infrastructure\DefaultCaptchaBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultCaptchaBuilderProvider.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\DefaultCaptchaBuilderProvider.cs">
       <Link>Infrastructure\DefaultCaptchaBuilderProvider.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultCaptchaManager.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\DefaultCaptchaManager.cs">
       <Link>Infrastructure\DefaultCaptchaManager.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\DefaultImageGenerator.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\DefaultImageGenerator.cs">
       <Link>Infrastructure\DefaultImageGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\FakeInputIntelligencePolicy.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\FakeInputIntelligencePolicy.cs">
       <Link>Infrastructure\FakeInputIntelligencePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\JavaScriptIntelligencePolicy.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\JavaScriptIntelligencePolicy.cs">
       <Link>Infrastructure\JavaScriptIntelligencePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MathCaptchaBuilder.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\MathCaptchaBuilder.cs">
       <Link>Infrastructure\MathCaptchaBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\MultiIntelligencePolicy.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\MultiIntelligencePolicy.cs">
       <Link>Infrastructure\MultiIntelligencePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\ParameterModelContainer.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\ParameterModelContainer.cs">
       <Link>Infrastructure\ParameterModelContainer.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\PartialCaptchaBuilder.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\PartialCaptchaBuilder.cs">
       <Link>Infrastructure\PartialCaptchaBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RandomNumber.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\RandomNumber.cs">
       <Link>Infrastructure\RandomNumber.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RandomText.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\RandomText.cs">
       <Link>Infrastructure\RandomText.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\RequestParameterContainer.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\RequestParameterContainer.cs">
       <Link>Infrastructure\RequestParameterContainer.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\ResponseTimeIntelligencePolicy.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\ResponseTimeIntelligencePolicy.cs">
       <Link>Infrastructure\ResponseTimeIntelligencePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\SessionStorageProvider.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\SessionStorageProvider.cs">
       <Link>Infrastructure\SessionStorageProvider.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Infrastructure\Validate.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\infrastructure\Validate.cs">
       <Link>Infrastructure\Validate.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IBuildInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IBuildInfoModel.cs">
       <Link>Interface\IBuildInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\ICaptcha.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\ICaptcha.cs">
       <Link>Interface\ICaptcha.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\ICaptchaBuilderProvider.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\ICaptchaBuilderProvider.cs">
       <Link>Interface\ICaptchaBuilderProvider.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\ICaptchaBulder.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\ICaptchaBulder.cs">
       <Link>Interface\ICaptchaBulder.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\ICaptchaManager.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\ICaptchaManager.cs">
       <Link>Interface\ICaptchaManager.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\ICaptchaValue.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\ICaptchaValue.cs">
       <Link>Interface\ICaptchaValue.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IDrawingModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IDrawingModel.cs">
       <Link>Interface\IDrawingModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IImageGenerator.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IImageGenerator.cs">
       <Link>Interface\IImageGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IIntelligencePolicy.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IIntelligencePolicy.cs">
       <Link>Interface\IIntelligencePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IParameterContainer.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IParameterContainer.cs">
       <Link>Interface\IParameterContainer.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IStorageProvider.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IStorageProvider.cs">
       <Link>Interface\IStorageProvider.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Interface\IUpdateInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\interface\IUpdateInfoModel.cs">
       <Link>Interface\IUpdateInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\BaseBuildInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\BaseBuildInfoModel.cs">
       <Link>Models\BaseBuildInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\CaptchaModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\CaptchaModel.cs">
       <Link>Models\CaptchaModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\CaptchaValueBase.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\CaptchaValueBase.cs">
       <Link>Infrastructure\CaptchaValueBase.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\DefaultBuildInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\DefaultBuildInfoModel.cs">
       <Link>Models\DefaultBuildInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\DefaultDrawingModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\DefaultDrawingModel.cs">
       <Link>Models\DefaultDrawingModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\DefaultUpdateInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\DefaultUpdateInfoModel.cs">
       <Link>Models\DefaultUpdateInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\IntelligentCaptchaDecorator.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\IntelligentCaptchaDecorator.cs">
       <Link>Models\IntelligentCaptchaDecorator.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\KeyTimeEntry.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\KeyTimeEntry.cs">
       <Link>Models\KeyTimeEntry.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\MathBuildInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\MathBuildInfoModel.cs">
       <Link>Models\MathBuildInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\NumberCaptchaValue.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\NumberCaptchaValue.cs">
       <Link>Models\NumberCaptchaValue.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\ParameterModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\ParameterModel.cs">
       <Link>Models\ParameterModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\PartialBuildInfoModel.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\PartialBuildInfoModel.cs">
       <Link>Models\PartialBuildInfoModel.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\StorageType.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\StorageType.cs">
       <Link>Models\StorageType.cs</Link>
     </Compile>
-    <Compile Include="..\CaptchaMvc%28Mvc 3%29\Models\StringCaptchaValue.cs">
+    <Compile Include="..\captchamvc%28mvc 3%29\models\StringCaptchaValue.cs">
       <Link>Models\StringCaptchaValue.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="sigkey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
